@@ -20,7 +20,7 @@ import {
 import './HowItWorksRefund.css';
 import {
     HelpClip, HelpCommand, HelpDefinitions, HelpFigure, HelpGuideRow, HelpKeys, HelpLegend, HelpLink,
-    HelpPath, HelpSteps, HelpSubhead,
+    HelpPath, HelpSteps, HelpSubhead, helpFill,
 } from './help/HelpParts';
 import { AnswerFlowFigure, NativelyGlyph, OverlayAnatomyFigure, PermissionsFigure } from './help/HelpGraphics';
 import { HELP_CLIPS, PERMISSIONS_CARD, type HelpClipEntry } from './help/helpClips';
@@ -252,6 +252,19 @@ const HelpPane: React.FC<{
     const rowCopy = getRowCopy(platform);
     const permissions = getPermissions(platform);
     const status = useSetupStatus(platform);
+    // Status details are facts with a name in them ("Deepgram · key saved",
+    // "Using Interview"): the fixed part is translated, the name is kept.
+    const tDetail = (detail: string): string => {
+        const whole = t(detail);
+        if (whole !== detail) return whole;
+        let m = /^(.+) · (runs on this computer|key saved|needs a key)$/.exec(detail);
+        if (m) return `${m[1]} · ${t(m[2])}`;
+        m = /^(.+) not allowed yet$/.exec(detail);
+        if (m) return t('{items} not allowed yet').replace('{items}', m[1].split(' and ').map((x) => t(x)).join(t(' and ')));
+        m = /^Using (.+)$/.exec(detail);
+        if (m) return t('Using {name}').replace('{name}', m[1]);
+        return detail;
+    };
     // Get started opens on what is already true, with no motion: descriptions
     // don't swap away from "Checking…" for steps done long ago (SettingsRow's
     // rule — state already true on open isn't news).
@@ -331,28 +344,28 @@ const HelpPane: React.FC<{
                                 <LiquidGlassBadge variant="neutral">{t('Quickest')}</LiquidGlassBadge>
                             </Presence>
                         }
-                        description={t(status.natively.detail)}
+                        description={tDetail(status.natively.detail)}
                         descriptionKey={status.natively.state}
                         control={onNavigate && <GoButton label={t('Plans & Billing')} onClick={go('plans')} />}
                     />
                     <SettingsRow
                         icon={<ShieldCheck size={20} />}
                         title={t('Allow permissions')}
-                        description={t(status.permissions?.detail ?? rowCopy.permissionsStep)}
+                        description={tDetail(status.permissions?.detail ?? rowCopy.permissionsStep)}
                         descriptionKey={status.permissions?.detail ?? 'unknown'}
                         control={stepAction(status.permissions, t('Open'), () => openPermission(permissions[0]))}
                     />
                     <SettingsRow
                         icon={<AudioLines size={20} />}
                         title={t('Choose a speech provider')}
-                        description={t(status.speech.detail)}
+                        description={tDetail(status.speech.detail)}
                         descriptionKey={status.speech.detail}
                         control={onNavigate && stepAction(status.speech, t('Audio'), go('audio'))}
                     />
                     <SettingsRow
                         icon={<FlaskConical size={20} />}
                         title={t('Choose an AI model')}
-                        description={t(status.model.detail)}
+                        description={tDetail(status.model.detail)}
                         descriptionKey={status.model.detail}
                         control={onNavigate && stepAction(status.model, t('AI Providers'), go('ai-providers'))}
                     />
@@ -367,7 +380,7 @@ const HelpPane: React.FC<{
                                 <LiquidGlassBadge variant="neutral">{status.mode.state === 'locked' ? t('Pro') : t('Optional')}</LiquidGlassBadge>
                             </Presence>
                         }
-                        description={t(status.mode.detail)}
+                        description={tDetail(status.mode.detail)}
                         descriptionKey={status.mode.detail}
                         control={onOpenModes && <GoButton label={t('Modes')} onClick={onOpenModes} />}
                     />
@@ -379,7 +392,7 @@ const HelpPane: React.FC<{
                                 <LiquidGlassBadge variant="neutral">{status.profile.state === 'locked' ? t('Pro') : t('Optional')}</LiquidGlassBadge>
                             </Presence>
                         }
-                        description={t(status.profile.detail)}
+                        description={tDetail(status.profile.detail)}
                         descriptionKey={status.profile.detail}
                         control={onOpenProfile && <GoButton label={t('Profile')} onClick={onOpenProfile} />}
                     />
@@ -437,12 +450,12 @@ const HelpPane: React.FC<{
                     {/* Permissions */}
                     <HelpGuideRow icon={<ShieldCheck size={20} />} title={t('Permissions')} description={t(rowCopy.permissionsGuide)}>
                         {facts.clips.permissions ? (
-                            <HelpFigure caption="Natively shows this card when it opens, until everything it needs is allowed.">
+                            <HelpFigure caption={t('Natively shows this card when it opens, until everything it needs is allowed.')}>
                                 <img
                                     src={isLight ? PERMISSIONS_CARD.light : PERMISSIONS_CARD.dark}
                                     width={PERMISSIONS_CARD.size[0]}
                                     height={PERMISSIONS_CARD.size[1]}
-                                    alt="Natively's permissions card: Screen Recording and Microphone, both showing Access granted."
+                                    alt={t("Natively's permissions card: Screen Recording and Microphone, both showing Access granted.")}
                                     className="block w-full h-auto"
                                 />
                             </HelpFigure>
@@ -451,26 +464,26 @@ const HelpPane: React.FC<{
                                 <PermissionsFigure platform={platform} />
                             </HelpFigure>
                         )}
-                        <p>{mac ? 'If you said no to either, turn it on by hand:' : `${permissions[0].why} If Natively can't hear you:`}</p>
+                        <p>{mac ? t('If you said no to either, turn it on by hand:') : `${t(permissions[0].why)} ${t("If Natively can't hear you:")}`}</p>
                         <HelpSteps
                             steps={[
                                 ...permissions.map((permission) => (
                                     <>
                                         <HelpPath parts={permission.path} />
-                                        {permission.olderTitle && <> ({permission.olderTitle} on macOS 14 and earlier)</>}
-                                        {mac ? <>: turn on Natively. </> : <>: turn on both switches. </>}
+                                        {permission.olderTitle && <> {t('({title} on macOS 14 and earlier)').replace('{title}', t(permission.olderTitle))}</>}
+                                        {mac ? <>{t(': turn on Natively. ')}</> : <>{t(': turn on both switches. ')}</>}
                                         <button type="button" onClick={() => openPermission(permission)} className="text-accent-primary underline decoration-transparent hover:decoration-current transition-colors duration-150 ease-out">
-                                            Open
+                                            {t('Open')}
                                         </button>
                                     </>
                                 )),
                                 facts.restartAfterGrant
-                                    ? <>Quit Natively and open it again. macOS applies screen permission after a restart.</>
-                                    : <>Start the meeting again.</>,
+                                    ? <>{t('Quit Natively and open it again. macOS applies screen permission after a restart.')}</>
+                                    : <>{t('Start the meeting again.')}</>,
                             ]}
                         />
                         {facts.stealthTypingNeedsAccessibility && (
-                            <p>Accessibility is only for Stealth Typing ({keys('focusInput')}). Natively asks the first time you use it.</p>
+                            <p>{helpFill(t('Accessibility is only for Stealth Typing ({keys}). Natively asks the first time you use it.'), { keys: keys('focusInput') })}</p>
                         )}
                     </HelpGuideRow>
 
@@ -484,19 +497,19 @@ const HelpPane: React.FC<{
                             <HelpClip clip={speechClip} label={speechClip.label} />
                         ) : (
                             <p>
-                                Choose one in <HelpPath parts={['Audio', 'Speech Provider']} />, paste its key, press Save, then Test Connection.
+                                {helpFill(t('Choose one in {path}, paste its key, press Save, then Test Connection.'), { path: <HelpPath parts={['Audio', 'Speech Provider']} /> })}
                             </p>
                         )}
                         <HelpDefinitions
                             items={[
-                                { term: 'Natively API', detail: 'Nothing to paste. It appears once your Natively key is saved.' },
-                                { term: 'Local Models', detail: 'Runs on this computer after a one-time download.' },
-                                { term: 'Google Cloud', detail: 'A service-account JSON file, chosen with Select File.' },
-                                { term: 'Azure Speech', detail: 'An API key and its Region, such as eastus.' },
-                                { term: 'Everything else', detail: "An API key from the provider's console." },
+                                { term: 'Natively API', detail: t('Nothing to paste. It appears once your Natively key is saved.') },
+                                { term: t('Local Models'), detail: t('Runs on this computer after a one-time download.') },
+                                { term: 'Google Cloud', detail: t('A service-account JSON file, chosen with Select File.') },
+                                { term: 'Azure Speech', detail: t('An API key and its Region, such as eastus.') },
+                                { term: t('Everything else'), detail: t("An API key from the provider's console.") },
                             ]}
                         />
-                        <p>A few languages are offered only by the Parakeet local model. {facts.systemAudio.fix}</p>
+                        <p>{t('A few languages are offered only by the Parakeet local model.')} {t(facts.systemAudio.fix)}</p>
                     </HelpGuideRow>
 
                     {/* AI models */}
@@ -509,27 +522,27 @@ const HelpPane: React.FC<{
                             <HelpClip clip={modelClip} label={modelClip.label} />
                         ) : (
                             <p>
-                                In <HelpPath parts={['AI Providers']} />, add a key under Cloud Providers, then choose the model in Active Model.
+                                {helpFill(t('In {path}, add a key under Cloud Providers, then choose the model in Active Model.'), { path: <HelpPath parts={['AI Providers']} /> })}
                             </p>
                         )}
-                        <p>During a meeting, the model button under the overlay's ask box switches models without opening Settings.</p>
+                        <p>{t("During a meeting, the model button under the overlay's ask box switches models without opening Settings.")}</p>
                         <HelpDefinitions
                             items={[
-                                { term: 'Background Model', detail: 'Runs Auto Answer, quick background decisions and Fast Response Mode. Auto is recommended.' },
-                                { term: 'Fast Response Mode', detail: "Text answers from the Background Model instead of the Active Model. On Auto, whichever connected model this computer has measured fastest. AI Providers says when it can't apply." },
-                                { term: 'Direct Assist', detail: 'Sends what you type, say or capture straight to the model, unprocessed. In beta.' },
-                                { term: 'Custom Providers', detail: <>A cURL command, with <code className="font-mono text-text-primary">{'{{TEXT}}'}</code> where the question goes.</> },
+                                { term: 'Background Model', detail: t('Runs Auto Answer, quick background decisions and Fast Response Mode. Auto is recommended.') },
+                                { term: t('Fast Response Mode'), detail: t("Text answers from the Background Model instead of the Active Model. On Auto, whichever connected model this computer has measured fastest. AI Providers says when it can't apply.") },
+                                { term: 'Direct Assist', detail: t('Sends what you type, say or capture straight to the model, unprocessed. In beta.') },
+                                { term: t('Custom Providers'), detail: helpFill(t('A cURL command, with {placeholder} where the question goes.'), { placeholder: <code className="font-mono text-text-primary">{'{{TEXT}}'}</code> }) },
                             ]}
                         />
-                        <HelpSubhead>Run a model on this computer</HelpSubhead>
+                        <HelpSubhead>{t('Run a model on this computer')}</HelpSubhead>
                         <HelpSteps
                             steps={[
-                                <>Install Ollama from <HelpLink href={OLLAMA_DOWNLOAD_URL}>ollama.com</HelpLink>.</>,
+                                <>{helpFill(t('Install Ollama from {link}.'), { link: <HelpLink href={OLLAMA_DOWNLOAD_URL}>ollama.com</HelpLink> })}</>,
                                 <div className="space-y-2">
-                                    <div>In {facts.terminal}, download a model that can chat:</div>
+                                    <div>{t('In {terminal}, download a model that can chat:').replace('{terminal}', facts.terminal)}</div>
                                     <HelpCommand command={OLLAMA_STARTER_COMMAND} />
                                 </div>,
-                                <>Open <HelpPath parts={['AI Providers', 'Local & Gateways']} />. Natively finds Ollama by itself.</>,
+                                <>{helpFill(t('Open {path}. Natively finds Ollama by itself.'), { path: <HelpPath parts={['AI Providers', 'Local & Gateways']} /> })}</>,
                             ]}
                         />
                     </HelpGuideRow>
@@ -542,22 +555,20 @@ const HelpPane: React.FC<{
                         </HelpFigure>
                         <HelpLegend
                             items={[
-                                { title: 'The pill', body: <>The logo opens the Launcher. Hide hides the overlay; {keys('toggleVisibility')} brings it back. The square ends the meeting.</> },
-                                { title: 'Live transcript', body: 'What is being said, as your speech provider hears it.' },
-                                { title: 'Quick actions', body: 'What to answer?, Clarify, Recap, Follow Up Question, and Answer, which records you. Settings › Overlay reorders them or swaps in Brainstorm, What did I miss?, Define or Sound smart.' },
-                                { title: 'Ask box', body: <>Type any question. {keys('selectiveScreenshot')} attaches part of the screen.</> },
-                                { title: 'Model', body: 'Switches the AI model.' },
-                                { title: 'Quick settings', body: 'Undetectable, Fast Response and Transcript.' },
-                                { title: 'Mouse passthrough', body: 'Lets clicks go through to the app behind.' },
+                                { title: t('The pill'), body: <>{helpFill(t('The logo opens the Launcher. Hide hides the overlay; {keys} brings it back. The square ends the meeting.'), { keys: keys('toggleVisibility') })}</> },
+                                { title: t('Live transcript'), body: t('What is being said, as your speech provider hears it.') },
+                                { title: t('Quick actions'), body: t('What to answer?, Clarify, Recap, Follow Up Question, and Answer, which records you. Settings › Overlay reorders them or swaps in Brainstorm, What did I miss?, Define or Sound smart.') },
+                                { title: t('Ask box'), body: <>{helpFill(t('Type any question. {keys} attaches part of the screen.'), { keys: keys('selectiveScreenshot') })}</> },
+                                { title: t('Model'), body: t('Switches the AI model.') },
+                                { title: t('Quick settings'), body: t('Undetectable, Fast Response and Transcript.') },
+                                { title: t('Mouse passthrough'), body: t('Lets clicks go through to the app behind.') },
                             ]}
                         />
                         <p>
-                            A suggestion can appear at the top of the overlay, one at a time, such as Suggest response or Solve coding
-                            problem. Click it or press {keys('acceptSuggestion')}. Screenshots you take wait in a tray above the ask box
-                            until you ask.
+                            {helpFill(t('A suggestion can appear at the top of the overlay, one at a time, such as Suggest response or Solve coding problem. Click it or press {keys}. Screenshots you take wait in a tray above the ask box until you ask.'), { keys: keys('acceptSuggestion') })}
                         </p>
                         <SettingsNotice tone={tones.warn} icon={<TriangleAlert size={14} />} className="mb-0">
-                            With mouse passthrough on, the overlay can't be clicked. Press {keys('toggleMousePassthrough')} to turn it off.
+                            {helpFill(t("With mouse passthrough on, the overlay can't be clicked. Press {keys} to turn it off."), { keys: keys('toggleMousePassthrough') })}
                         </SettingsNotice>
                     </HelpGuideRow>
 
@@ -569,12 +580,10 @@ const HelpPane: React.FC<{
                     >
                         {autoAnswerClip && <HelpClip clip={autoAnswerClip} label={autoAnswerClip.label} />}
                         <p>
-                            Turn it on in <HelpPath parts={['General']} />, where it is marked Beta. Each question is answered when it ends,
-                            with nothing to press, and questions meant for someone else in the call are skipped.
+                            {helpFill(t('Turn it on in {path}, where it is marked Beta. Each question is answered when it ends, with nothing to press, and questions meant for someone else in the call are skipped.'), { path: <HelpPath parts={['General']} /> })}
                         </p>
                         <p>
-                            Auto Answer runs on the Background Model, in <HelpPath parts={['AI Providers']} />. What to answer? still works
-                            for anything it didn't answer.
+                            {helpFill(t("Auto Answer runs on the Background Model, in {path}. What to answer? still works for anything it didn't answer."), { path: <HelpPath parts={['AI Providers']} /> })}
                         </p>
                     </HelpGuideRow>
 
@@ -587,24 +596,20 @@ const HelpPane: React.FC<{
                         {notesClip ? (
                             <HelpClip clip={notesClip} label={notesClip.label} />
                         ) : (
-                            <p>Open a meeting from the Launcher: Summary holds its notes, Transcript what was said, Usage what you asked.</p>
+                            <p>{t('Open a meeting from the Launcher: Summary holds its notes, Transcript what was said, Usage what you asked.')}</p>
                         )}
                         <p>
-                            Notes and follow-up emails are written by Natively API, Groq, Gemini, a Codex or Antigravity sign-in, your own
-                            endpoint, or Ollama when it is your model. With only another cloud key, such as OpenAI, Claude, DeepSeek or
-                            OpenRouter, the Summary says Notes couldn't be generated. Usage lists what you asked during the meeting.
+                            {t("Notes and follow-up emails are written by Natively API, Groq, Gemini, a Codex or Antigravity sign-in, your own endpoint, or Ollama when it is your model. With only another cloud key, such as OpenAI, Claude, DeepSeek or OpenRouter, the Summary says Notes couldn't be generated. Usage lists what you asked during the meeting.")}
                         </p>
-                        <HelpSubhead>Follow-up email</HelpSubhead>
+                        <HelpSubhead>{t('Follow-up email')}</HelpSubhead>
                         {followupClip && <HelpClip clip={followupClip} label={followupClip.label} />}
                         <p>
-                            Under the notes, Generate writes an email from them; change its tone or copy it. When the meeting is linked to a
-                            calendar event, its attendees fill To: and Open in Gmail starts the email there.
+                            {t('Under the notes, Generate writes an email from them; change its tone or copy it. When the meeting is linked to a calendar event, its attendees fill To: and Open in Gmail starts the email there.')}
                         </p>
-                        <HelpSubhead>Find it again</HelpSubhead>
+                        <HelpSubhead>{t('Find it again')}</HelpSubhead>
                         {searchClip && <HelpClip clip={searchClip} label={searchClip.label} />}
                         <p>
-                            <HelpKeys inline keys={[facts.modifierKey, 'K']} /> opens search in the Launcher and finds a meeting by its title;
-                            Enter asks AI instead. To keep nothing, turn on Do not save meetings in <HelpPath parts={['General']} />.
+                            {helpFill(t('{keys} opens search in the Launcher and finds a meeting by its title; Enter asks AI instead. To keep nothing, turn on Do not save meetings in {path}.'), { keys: <HelpKeys inline keys={[facts.modifierKey, 'K']} />, path: <HelpPath parts={['General']} /> })}
                         </p>
                     </HelpGuideRow>
 
@@ -617,21 +622,18 @@ const HelpPane: React.FC<{
                         {calendarClip && <HelpClip clip={calendarClip} label={calendarClip.label} />}
                         <HelpSteps
                             steps={[
-                                <>In <HelpPath parts={['Calendar']} />, press Connect next to Google Calendar, Outlook, Apple Calendar (on a Mac) or a calendar link. Natively only reads your events.</>,
-                                'Your next meetings appear there and on the Launcher. In Calendar, from 15 minutes before one starts, its Start Natively button starts a session linked to it.',
-                                "A linked session takes the event's title and attendees. Your voice is labelled with your first name, and in a one-to-one the other person's is too.",
+                                <>{helpFill(t('In {path}, press Connect next to Google Calendar, Outlook, Apple Calendar (on a Mac) or a calendar link. Natively only reads your events.'), { path: <HelpPath parts={['Calendar']} /> })}</>,
+                                t('Your next meetings appear there and on the Launcher. In Calendar, from 15 minutes before one starts, its Start Natively button starts a session linked to it.'),
+                                t("A linked session takes the event's title and attendees. Your voice is labelled with your first name, and in a one-to-one the other person's is too."),
                             ]}
                         />
                         <p>
-                            To change the link, use the calendar button next to Copy on a meeting's notes, and pick the event or Not a calendar
-                            meeting.
+                            {t("To change the link, use the calendar button next to Copy on a meeting's notes, and pick the event or Not a calendar meeting.")}
                         </p>
-                        <HelpSubhead>Detect meetings</HelpSubhead>
+                        <HelpSubhead>{t('Detect meetings')}</HelpSubhead>
                         <p>
-                            On by default, in <HelpPath parts={['Calendar']} />, with or without a calendar: when a call starts in Zoom, Teams, Meet,
-                            Webex, Slack or another call app, Natively offers to start: a notice in the window and a notification.
-                            Turn on Start automatically to start after 10 seconds unless you press Not now. It stays quiet while Undetectable is on.
-                            {facts.meetingDetection && <> {facts.meetingDetection}</>}
+                            {helpFill(t('On by default, in {path}, with or without a calendar: when a call starts in Zoom, Teams, Meet, Webex, Slack or another call app, Natively offers to start: a notice in the window and a notification. Turn on Start automatically to start after 10 seconds unless you press Not now. It stays quiet while Undetectable is on.'), { path: <HelpPath parts={['Calendar']} /> })}
+                            {facts.meetingDetection && <> {t(facts.meetingDetection)}</>}
                         </p>
                     </HelpGuideRow>
 
@@ -644,11 +646,10 @@ const HelpPane: React.FC<{
                         {modesClip ? (
                             <HelpClip clip={modesClip} label={modesClip.label} />
                         ) : (
-                            <p>Open Modes from the grid icon in the Launcher header, pick a mode, write its Real-time prompt, then Set active.</p>
+                            <p>{t('Open Modes from the grid icon in the Launcher header, pick a mode, write its Real-time prompt, then Set active.')}</p>
                         )}
                         <p>
-                            Reference files give a mode documents to answer from, and Deactivate returns to Natively's default. Modes and
-                            Profile Intelligence are part of Natively Pro, in <HelpPath parts={['Plans & Billing']} />; a free trial opens both.
+                            {helpFill(t("Reference files give a mode documents to answer from, and Deactivate returns to Natively's default. Modes and Profile Intelligence are part of Natively Pro, in {path}; a free trial opens both."), { path: <HelpPath parts={['Plans & Billing']} /> })}
                         </p>
                     </HelpGuideRow>
 
@@ -661,11 +662,10 @@ const HelpPane: React.FC<{
                         {profileClip ? (
                             <HelpClip clip={profileClip} label={profileClip.label} />
                         ) : (
-                            <p>Open it from the person icon in the Launcher header, and upload your résumé and the job description.</p>
+                            <p>{t('Open it from the person icon in the Launcher header, and upload your résumé and the job description.')}</p>
                         )}
                         <p>
-                            Only the Looking for work and Technical Interview modes use it. Company Intel researches the company, and Cover
-                            Letter drafts one from both documents.
+                            {t('Only the Looking for work and Technical Interview modes use it. Company Intel researches the company, and Cover Letter drafts one from both documents.')}
                         </p>
                     </HelpGuideRow>
 
@@ -677,18 +677,16 @@ const HelpPane: React.FC<{
                     >
                         {retrievalClip && <HelpClip clip={retrievalClip} label={retrievalClip.label} />}
                         <p>
-                            When you ask, the embedding model finds candidate passages in your documents, such as a mode's reference files,
-                            and the reranker picks the ones that answer. Choose both in <HelpPath parts={['Retrieval']} />, separately from
-                            your AI model.
+                            {helpFill(t("When you ask, the embedding model finds candidate passages in your documents, such as a mode's reference files, and the reranker picks the ones that answer. Choose both in {path}, separately from your AI model."), { path: <HelpPath parts={['Retrieval']} /> })}
                         </p>
                         <HelpDefinitions
                             items={[
-                                { term: 'Hosted', detail: 'Providers such as Natively API, Voyage AI, OpenAI or Jina AI. The text being searched is sent to that provider.' },
-                                { term: 'On this device', detail: 'Local Embeddings and Local Reranker come with Natively; more models download from Hugging Face. Nothing leaves this computer.' },
-                                { term: 'Fall back to the local reranker', detail: 'If a hosted reranker fails, reranking happens on this device instead.' },
+                                { term: t('Hosted'), detail: t('Providers such as Natively API, Voyage AI, OpenAI or Jina AI. The text being searched is sent to that provider.') },
+                                { term: t('On this device'), detail: t('Local Embeddings and Local Reranker come with Natively; more models download from Hugging Face. Nothing leaves this computer.') },
+                                { term: t('Fall back to the local reranker'), detail: t('If a hosted reranker fails, reranking happens on this device instead.') },
                             ]}
                         />
-                        <p>Changing the embedding model re-indexes your files.</p>
+                        <p>{t('Changing the embedding model re-indexes your files.')}</p>
                     </HelpGuideRow>
 
                     {/* Staying invisible */}
@@ -699,30 +697,27 @@ const HelpPane: React.FC<{
                     >
                         {stealthClip && <HelpClip clip={stealthClip} label={stealthClip.label} />}
                         <p>
-                            Turn on the Detectable switch in <HelpPath parts={['General']} />; it then reads Undetectable. Natively asks the
-                            system to keep its windows out of screen shares and recordings, and hides {facts.undetectable.hides}.
-                            {' '}{facts.undetectable.caveat}
+                            {helpFill(t('Turn on the Detectable switch in {path}; it then reads Undetectable. Natively asks the system to keep its windows out of screen shares and recordings, and hides {hides}.'), { path: <HelpPath parts={['General']} />, hides: t(facts.undetectable.hides) })}
+                            {' '}{t(facts.undetectable.caveat)}
                         </p>
                         <p>
-                            Process Disguise makes Natively look like {facts.disguises.join(', ').replace(/, ([^,]*)$/, ' or $1')} while
-                            Undetectable is on. Choose it first: it can't be changed while Undetectable is on.
+                            {t("Process Disguise makes Natively look like {apps} while Undetectable is on. Choose it first: it can't be changed while Undetectable is on.").replace('{apps}', facts.disguises.map((name) => t(name)).join(', ').replace(/, ([^,]*)$/, `${t(' or ')}$1`))}
                         </p>
                         <SettingsNotice tone={tones.warn} icon={<TriangleAlert size={14} />} className="mb-0">
-                            Check with a test share before a call that matters.
+                            {t('Check with a test share before a call that matters.')}
                         </SettingsNotice>
                         {facts.zoomGuide && (
                             <>
                                 <HelpSubhead>Zoom</HelpSubhead>
                                 <p>
-                                    In <HelpPath parts={['Zoom', 'Settings', 'Share Screen', 'Advanced']} />, set Screen capture mode to Advanced
-                                    capture with window filtering. The other modes capture Natively.
+                                    {helpFill(t('In {path}, set Screen capture mode to Advanced capture with window filtering. The other modes capture Natively.'), { path: <HelpPath parts={['Zoom', 'Settings', 'Share Screen', 'Advanced']} /> })}
                                 </p>
                                 <HelpFigure>
                                     <img
                                         src={zoomCaptureModeScreenshot}
                                         width={1212}
                                         height={1008}
-                                        alt="Zoom's Share Screen settings, with Screen capture mode set to Advanced capture with window filtering"
+                                        alt={t("Zoom's Share Screen settings, with Screen capture mode set to Advanced capture with window filtering")}
                                         className="block w-full"
                                     />
                                 </HelpFigure>
@@ -738,37 +733,33 @@ const HelpPane: React.FC<{
                     >
                         {phoneClip && <HelpClip clip={phoneClip} label={phoneClip.label} />}
                         <p>
-                            Phone Mirror shows the live transcript and each answer as it is written, with the overlay's buttons: tap What to Say
-                            for an answer, ask in the text box, or send a photo or screenshot from the phone. Clearing the screen there clears
-                            only the phone.
+                            {t("Phone Mirror shows the live transcript and each answer as it is written, with the overlay's buttons: tap What to Say for an answer, ask in the text box, or send a photo or screenshot from the phone. Clearing the screen there clears only the phone.")}
                         </p>
-                        <HelpSubhead>Pair a phone</HelpSubhead>
+                        <HelpSubhead>{t('Pair a phone')}</HelpSubhead>
                         {syncClip ? (
                             <HelpClip clip={syncClip} label={syncClip.label} />
                         ) : (
                             <HelpSteps
                                 steps={[
-                                    <>In <HelpPath parts={['Companion']} />, turn on Enable Phone Mirror.</>,
-                                    'Turn on Allow LAN access so your phone can reach it over the same Wi-Fi.',
-                                    "On Pair a phone, press Show code and scan it with your phone's camera.",
+                                    <>{helpFill(t('In {path}, turn on Enable Phone Mirror.'), { path: <HelpPath parts={['Companion']} /> })}</>,
+                                    t('Turn on Allow LAN access so your phone can reach it over the same Wi-Fi.'),
+                                    t("On Pair a phone, press Show code and scan it with your phone's camera."),
                                 ]}
                             />
                         )}
                         <SettingsNotice tone={tones.warn} icon={<TriangleAlert size={14} />} className="mb-0">
-                            Allow LAN access only on networks you trust. Anyone with the pairing link can read your answers until you
-                            press Reset pairing.
+                            {t('Allow LAN access only on networks you trust. Anyone with the pairing link can read your answers until you press Reset pairing.')}
                         </SettingsNotice>
-                        <HelpSubhead>Browser extension</HelpSubhead>
+                        <HelpSubhead>{t('Browser extension')}</HelpSubhead>
                         <HelpSteps
                             steps={[
-                                <>Install Natively Companion from the <HelpLink href={CHROME_WEB_STORE_URL}>Chrome Web Store</HelpLink>.</>,
-                                <>With Phone Mirror on, press Connect on its row in <HelpPath parts={['Companion']} />.</>,
-                                "Within a minute, click the extension's icon and press Connect to Natively.",
+                                <>{helpFill(t('Install Natively Companion from the {link}.'), { link: <HelpLink href={CHROME_WEB_STORE_URL}>Chrome Web Store</HelpLink> })}</>,
+                                <>{helpFill(t('With Phone Mirror on, press Connect on its row in {path}.'), { path: <HelpPath parts={['Companion']} /> })}</>,
+                                t("Within a minute, click the extension's icon and press Connect to Natively."),
                             ]}
                         />
                         <p>
-                            Then {keys('capturePage')} sends the page you're reading. Smart Browser Context, also in Companion, spots coding and
-                            interview pages and attaches the problem when you ask.
+                            {helpFill(t("Then {keys} sends the page you're reading. Smart Browser Context, also in Companion, spots coding and interview pages and attaches the problem when you ask."), { keys: keys('capturePage') })}
                         </p>
                     </HelpGuideRow>
 
@@ -781,15 +772,14 @@ const HelpPane: React.FC<{
                         {verifyClip ? (
                             <HelpClip clip={verifyClip} label={verifyClip.label} />
                         ) : (
-                            <p>Turn it on in <HelpPath parts={['General', 'Show advanced settings']} />.</p>
+                            <p>{helpFill(t('Turn it on in {path}.'), { path: <HelpPath parts={['General', 'Show advanced settings']} /> })}</p>
                         )}
                         <p>
-                            A passing answer shows ✓ verified. A failing one goes back to the model with the error, and is replaced by a
-                            Corrected answer only if the fix passes too.
+                            {t('A passing answer shows ✓ verified. A failing one goes back to the model with the error, and is replaced by a Corrected answer only if the fix passes too.')}
                         </p>
                         <p>
-                            It uses tools already on this computer: {facts.pythonCommand}, node, g++, javac and java, go, and sqlite3.
-                            {facts.sqliteBundled ? '' : " sqlite3 doesn't come with Windows."} A language without its tool is skipped.
+                            {t('It uses tools already on this computer: {python}, node, g++, javac and java, go, and sqlite3.').replace('{python}', facts.pythonCommand.replace(' or ', t(' or ')))}
+                            {facts.sqliteBundled ? '' : t(" sqlite3 doesn't come with Windows.")} {t('A language without its tool is skipped.')}
                         </p>
                     </HelpGuideRow>
                 </div>

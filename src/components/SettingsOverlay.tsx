@@ -1839,7 +1839,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
     };
 
     const handleRemoveSttKey = async (provider: 'groq' | 'openai' | 'deepgram' | 'elevenlabs' | 'azure' | 'ibmwatson' | 'soniox' | 'qwen') => {
-        if (!(await askConfirm({ title: `Are you sure you want to remove the ${provider === 'ibmwatson' ? 'IBM Watson' : provider.charAt(0).toUpperCase() + provider.slice(1)} API key?` }))) return;
+        if (!(await askConfirm({ title: t('Are you sure you want to remove the {provider} API key?').replace('{provider}', provider === 'ibmwatson' ? 'IBM Watson' : provider.charAt(0).toUpperCase() + provider.slice(1)) }))) return;
 
         try {
             if (provider === 'groq') {
@@ -1888,7 +1888,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
     };
 
     const handleRemoveTavilyKey = async () => {
-        if (!(await askConfirm({ title: 'Are you sure you want to remove the Tavily API Key?' }))) return;
+        if (!(await askConfirm({ title: t('Are you sure you want to remove the Tavily API Key?') }))) return;
 
         try {
             await window.electronAPI?.setTavilyApiKey?.('');
@@ -3544,7 +3544,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
                                                                Windows logo exists under a licence compatible with AGPL-3.0 (it is in
                                                                neither lobehub nor simple-icons — see the README). `isMac` is the same
                                                                platform source the rest of this panel uses. */
-                                                            { id: 'local-whisper', label: 'Local Models', badge: null, desc: t('Privacy-first: runs 100% on your device'), color: 'green', icon: <BrandMark provider={isMac ? 'apple' : 'microsoft'} />, neutralTile: true },
+                                                            { id: 'local-whisper', label: t('Local Models'), badge: null, desc: t('Privacy-first: runs 100% on your device'), color: 'green', icon: <BrandMark provider={isMac ? 'apple' : 'microsoft'} />, neutralTile: true },
                                                         ]}
                                                     />
                                                 </div>
@@ -3584,7 +3584,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
                                                         </button>
                                                     </div>
                                                     {googleServiceAccountError && (
-                                                        <p className="text-xs text-red-400 mt-2">{googleServiceAccountError}</p>
+                                                        <p className="text-xs text-red-400 mt-2">{t(googleServiceAccountError)}</p>
                                                     )}
                                                     <p className="text-[10px] text-text-tertiary mt-2">
                                                         {t('Required for Google Cloud Speech-to-Text.')}
@@ -3907,7 +3907,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
 
                                                         {/* One note line, and only when something is actually wrong. */}
                                                         {sttTestStatus === 'error' && sttTestError && (
-                                                            <p className="aip-meta aip-danger-fg aip-provider-note settings-swap-in" role="alert">{sttTestError}</p>
+                                                            <p className="aip-meta aip-danger-fg aip-provider-note settings-swap-in" role="alert">{t(sttTestError)}</p>
                                                         )}
                                                     </div>
                                                     {/* OpenAI's server note sits under the card, in the footnote
@@ -4086,7 +4086,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
                                                         </div>
                                                     )}
                                                     {appleInstallError && (
-                                                        <p className="text-[11px] text-amber-200/90 mt-2">{appleInstallError}</p>
+                                                        <p className="text-[11px] text-amber-200/90 mt-2">{t(appleInstallError)}</p>
                                                     )}
                                                 </div>
                                             )}
@@ -4323,7 +4323,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
                                                         <div className="flex justify-between text-xs text-text-secondary mb-2 px-1">
                                                             <span>{t('System Audio Level')}</span>
                                                             {systemAudioError && (
-                                                                <span className="text-red-500 settings-swap-in" title={systemAudioError}>
+                                                                <span className="text-red-500 settings-swap-in" title={t(systemAudioError)}>
                                                                     {t('Unavailable')}
                                                                 </span>
                                                             )}
@@ -4339,7 +4339,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
                                                 {/* Full width under the pair: the reason is a sentence, and half
                                                     a column would wrap it into a block. */}
                                                 {systemAudioError && (
-                                                    <p className="text-xs text-red-500 mt-2 px-1 settings-swap-in">{systemAudioError}</p>
+                                                    <p className="text-xs text-red-500 mt-2 px-1 settings-swap-in">{t(systemAudioError)}</p>
                                                 )}
                                             </div>
 

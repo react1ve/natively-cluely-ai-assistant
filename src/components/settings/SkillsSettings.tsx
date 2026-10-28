@@ -208,7 +208,7 @@ export const SkillsSettings: React.FC = () => {
             if (result?.success) folderOpenedRef.current = true;
             if (!result?.success && result?.error) setStatus(result.error);
         } catch (error: any) {
-            setStatus(error?.message || 'Could not open skills folder.');
+            setStatus(error?.message || t('Could not open skills folder.'));
         }
     };
 
@@ -240,7 +240,7 @@ export const SkillsSettings: React.FC = () => {
                         // code in brackets in front ("description/missing_description").
                         first?.message
                             ? `Couldn't add this skill. ${first.message}`
-                            : "Couldn't add this skill.",
+                            : t("Couldn't add this skill."),
                     );
                     // The validator may still return a preview even on failure
                     // (e.g. install-time error after a successful validate) —
@@ -254,11 +254,11 @@ export const SkillsSettings: React.FC = () => {
                 }
                 return outcome ?? null;
             } catch (error: any) {
-                setStatus(error?.message || 'Upload failed.');
+                setStatus(error?.message || t('Upload failed.'));
                 return null;
             }
         },
-        [],
+        [t],
     );
 
     const handleFilePicked = async (file: File) => {
@@ -348,14 +348,14 @@ export const SkillsSettings: React.FC = () => {
         }
         if (sawDirectory) {
             setStatus(
-                'A folder can’t be dropped here. Use Open folder and put the skill folder in it.',
+                t('A folder can’t be dropped here. Use Open folder and put the skill folder in it.'),
             );
         }
         if (fileItems.length === 0) return;
 
         if (fileItems.length > 1) {
             setStatus(
-                `Only one .md file can be uploaded at a time (got ${fileItems.length}). Pick a single SKILL.md file.`,
+                t('Only one .md file can be uploaded at a time (got {count}). Pick a single SKILL.md file.').replace('{count}', String(fileItems.length)),
             );
             return;
         }
@@ -376,7 +376,7 @@ export const SkillsSettings: React.FC = () => {
         try {
             const outcome = await runUpload(preview.payload, true);
             if (outcome?.stage === 'installed') {
-                setSuccess(`Installed "${outcome.preview.name}" to ${outcome.installedPath}`);
+                setSuccess(t('Installed "{name}" to {path}').replace('{name}', outcome.preview.name).replace('{path}', outcome.installedPath));
             } else if (outcome?.stage === 'failed') {
                 // runUpload already surfaced the error via setStatus; we just
                 // refresh the list in case the install partially landed.
@@ -385,8 +385,7 @@ export const SkillsSettings: React.FC = () => {
                 // (e.g. opts being dropped on the IPC boundary) is visible.
                 // Also surface a banner so the user is never silently stuck.
                 setStatus(
-                    `Install returned unexpected stage '${outcome?.stage ?? 'undefined'}'. ` +
-                    `Check the console for details.`,
+                    t("Install returned unexpected stage '{stage}'. Check the console for details.").replace('{stage}', String(outcome?.stage ?? 'undefined')),
                 );
                 // eslint-disable-next-line no-console
                 console.warn('[SkillsSettings] unexpected upload outcome:', outcome);
@@ -450,13 +449,13 @@ export const SkillsSettings: React.FC = () => {
         try {
             const result = await window.electronAPI.skillsDelete(id);
             if (result?.success) {
-                setSuccess(`Deleted "${name}".`);
+                setSuccess(t('Deleted "{name}".').replace('{name}', name));
                 await loadSkills();
             } else {
-                setStatus(result?.error || 'Could not delete skill.');
+                setStatus(result?.error || t('Could not delete skill.'));
             }
         } catch (error: any) {
-            setStatus(error?.message || 'Could not delete skill.');
+            setStatus(error?.message || t('Could not delete skill.'));
         } finally {
             markInFlight(setDeletingIds, id, false);
         }
@@ -619,7 +618,7 @@ export const SkillsSettings: React.FC = () => {
                     <Collapse open={!!status}>
                         <div className="pt-1.5 pb-2">
                             <SettingsNotice tone={tones.danger} icon={<AlertCircle size={14} />} alert shakeKey={status ?? ''} className="">
-                                {status}
+                                {status && t(status)}
                             </SettingsNotice>
                         </div>
                     </Collapse>
@@ -651,7 +650,7 @@ export const SkillsSettings: React.FC = () => {
                                                 <div
                                                     role="group"
                                                     aria-live="polite"
-                                                    aria-label={`Confirm delete ${skill.name}`}
+                                                    aria-label={`${t('Confirm delete')} ${skill.name}`}
                                                     className="flex items-center gap-2"
                                                 >
                                                     <button
@@ -681,7 +680,7 @@ export const SkillsSettings: React.FC = () => {
                                                     onClick={() => requestDeleteSkill(skill.id)}
                                                     disabled={deleting}
                                                     title={t('Delete skill')}
-                                                    aria-label={`Delete ${skill.name}`}
+                                                    aria-label={`${t('Delete')} ${skill.name}`}
                                                 >
                                                     <Presence kind="icon" id={deleting ? 'busy' : 'idle'}>
                                                         {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}

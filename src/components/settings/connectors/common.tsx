@@ -21,6 +21,7 @@ export function flashOf(res: OutputResult | undefined, okText?: string): Flash {
 }
 
 export const FlashNotice: React.FC<{ flash: Flash }> = ({ flash }) => {
+    const t = useT();
     const tones = useSettingsTones();
     return (
         <Collapse open={!!flash}>
@@ -33,7 +34,7 @@ export const FlashNotice: React.FC<{ flash: Flash }> = ({ flash }) => {
                         shakeKey={flash.text}
                         className=""
                     >
-                        {flash.text}
+                        {t(flash.text)}
                     </SettingsNotice>
                 )}
             </div>

@@ -4,6 +4,7 @@ import nativelyIcon from '../../icon.png';
 import { useResolvedTheme } from '../../../hooks/useResolvedTheme';
 import type { HelpPlatform } from '../../../lib/helpContent.mjs';
 import { HelpCallout } from './HelpParts';
+import { useT } from '../../../i18n';
 
 // Illustrations for Setup & Help. Drawn from the app's own tokens rather than
 // screenshots, so they follow the theme, stay sharp at any scale and cannot
@@ -34,11 +35,13 @@ const MockSwitch: React.FC = () => (
 
 // `perApp`: macOS lists each app with its own switch; Windows' microphone page
 // has plain switches with no app in them, so it draws none.
-const MockPermissionRow: React.FC<{ icon: React.ReactNode; label: string; detail: string; perApp?: boolean }> = ({ icon, label, detail, perApp = true }) => (
+const MockPermissionRow: React.FC<{ icon: React.ReactNode; label: string; detail: string; perApp?: boolean }> = ({ icon, label, detail, perApp = true }) => {
+  const t = useT();
+  return (
   <div className="px-3 py-2.5">
     <div className="flex items-center gap-2 text-[11px] font-semibold text-text-primary">
       <span className="text-text-secondary">{icon}</span>
-      {label}
+      {t(label)}
     </div>
     <div className="mt-2 flex items-center justify-between gap-3 rounded-md border border-border-subtle bg-bg-item-surface px-2.5 py-1.5">
       <span className="flex items-center gap-2 text-[11px] text-text-primary">
@@ -47,12 +50,13 @@ const MockPermissionRow: React.FC<{ icon: React.ReactNode; label: string; detail
             <NativelyGlyph size={11} />
           </span>
         )}
-        {detail}
+        {t(detail)}
       </span>
       <MockSwitch />
     </div>
   </div>
-);
+  );
+};
 
 /**
  * The OS privacy page with Natively allowed, per platform. macOS: the two panes
@@ -61,6 +65,7 @@ const MockPermissionRow: React.FC<{ icon: React.ReactNode; label: string; detail
  * where desktop apps are allowed as a group rather than one by one.
  */
 export const PermissionsFigure: React.FC<{ platform: HelpPlatform }> = ({ platform }) => {
+  const t = useT();
   const mac = platform === 'darwin';
   return (
     <div className="p-4 flex justify-center bg-bg-main">
@@ -72,7 +77,7 @@ export const PermissionsFigure: React.FC<{ platform: HelpPlatform }> = ({ platfo
             </span>
           ) : null}
           <span className="text-[11px] font-semibold text-text-primary">
-            {mac ? 'Privacy & Security' : 'Privacy & security › Microphone'}
+            {mac ? t('Privacy & Security') : t('Privacy & security › Microphone')}
           </span>
         </div>
         <div className="divide-y divide-border-subtle">
@@ -100,16 +105,19 @@ export const PermissionsFigure: React.FC<{ platform: HelpPlatform }> = ({ platfo
 // The AI stage wears the flask the Settings sidebar gives AI Providers, not the
 // stock sparkles, so the picture points at the tab where the model is chosen.
 
-const FlowStage: React.FC<{ icon: React.ReactNode; title: string; detail: string }> = ({ icon, title, detail }) => (
+const FlowStage: React.FC<{ icon: React.ReactNode; title: string; detail: string }> = ({ icon, title, detail }) => {
+  const t = useT();
+  return (
   <div className="flex flex-col items-center text-center min-w-0">
     <div className="w-10 h-10 bg-bg-item-surface rounded-lg border border-border-subtle text-text-primary flex items-center justify-center shrink-0">
       {icon}
     </div>
     {/* One line each: a stage is a label, not a sentence (the column is ~115px). */}
-    <div className="mt-2 text-xs font-semibold text-text-primary leading-tight whitespace-nowrap">{title}</div>
-    <div className="mt-0.5 text-[11px] text-text-secondary leading-snug whitespace-nowrap">{detail}</div>
+    <div className="mt-2 text-xs font-semibold text-text-primary leading-tight whitespace-nowrap">{t(title)}</div>
+    <div className="mt-0.5 text-[11px] text-text-secondary leading-snug whitespace-nowrap">{t(detail)}</div>
   </div>
-);
+  );
+};
 
 const FlowArrow: React.FC = () => (
   <div aria-hidden className="flex h-10 items-center text-text-secondary">
@@ -118,10 +126,12 @@ const FlowArrow: React.FC = () => (
   </div>
 );
 
-export const AnswerFlowFigure: React.FC = () => (
+export const AnswerFlowFigure: React.FC = () => {
+  const t = useT();
+  return (
   <div
     role="img"
-    aria-label="Meeting audio goes to your speech provider, which turns it into text. Your AI model reads that text and your screen, and the answer appears in the overlay."
+    aria-label={t('Meeting audio goes to your speech provider, which turns it into text. Your AI model reads that text and your screen, and the answer appears in the overlay.')}
     className="grid grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] items-start gap-x-1.5 px-3 py-4 bg-bg-main"
   >
     <FlowStage
@@ -136,7 +146,8 @@ export const AnswerFlowFigure: React.FC = () => (
     <FlowArrow />
     <FlowStage icon={<NativelyGlyph size={18} />} title="Answer" detail="In the overlay" />
   </div>
-);
+  );
+};
 
 // ── The overlay, labelled ────────────────────────────────────────────────
 // A schematic of NativelyInterface, not a replica: the parts a person touches,
@@ -159,8 +170,10 @@ const Pin: React.FC<{ n: number; className: string }> = ({ n, className }) => (
   </span>
 );
 
-export const OverlayAnatomyFigure: React.FC = () => (
-  <div role="img" aria-label="The Natively overlay: a pill above a panel with the live transcript, quick actions, the ask box and a bottom row of controls." className="bg-bg-main px-8 py-5">
+export const OverlayAnatomyFigure: React.FC = () => {
+  const t = useT();
+  return (
+  <div role="img" aria-label={t('The Natively overlay: a pill above a panel with the live transcript, quick actions, the ask box and a bottom row of controls.')} className="bg-bg-main px-8 py-5">
     <div aria-hidden className="relative mx-auto max-w-[400px] select-none">
       {/* 1 — the pill */}
       <div className="relative mx-auto mb-2 flex w-fit items-center gap-1.5 rounded-full border border-border-subtle bg-bg-item-surface p-1">
@@ -168,7 +181,7 @@ export const OverlayAnatomyFigure: React.FC = () => (
           <NativelyGlyph size={13} />
         </span>
         <span className="flex items-center gap-1 rounded-full border border-border-muted bg-bg-item-surface px-2.5 py-0.5 text-[10px] font-medium text-text-primary">
-          <ChevronUp size={10} /> Hide
+          <ChevronUp size={10} /> {t('Hide')}
         </span>
         <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border-muted bg-bg-item-active">
           <span className="h-2.5 w-2.5 rounded-[2px] bg-text-primary opacity-80" />
@@ -180,26 +193,26 @@ export const OverlayAnatomyFigure: React.FC = () => (
         {/* 2 — rolling transcript */}
         <div className="relative">
           <div className="truncate text-right text-[10px] italic text-text-secondary" style={{ maskImage: 'linear-gradient(to right, transparent, black 25%)' }}>
-            …and we'd want the cache in front of the payments service
+            {t("…and we'd want the cache in front of the payments service")}
           </div>
           <Pin n={2} className="-left-10 top-1/2 -translate-y-1/2" />
         </div>
 
         {/* an answer, as the overlay draws one */}
         <div className="my-2.5 ml-auto w-[78%] rounded-[14px] rounded-tr-[4px] border border-border-subtle bg-bg-item-surface px-2.5 py-1.5 text-[10px] leading-snug text-text-primary">
-          Put Redis in front of it and expire keys on write, so a retry never reads a stale total.
+          {t('Put Redis in front of it and expire keys on write, so a retry never reads a stale total.')}
         </div>
 
         {/* 3 — quick actions */}
         <div className="relative flex flex-wrap justify-center gap-1">
-          {QUICK_ACTIONS.map((label) => <Chip key={label}>{label}</Chip>)}
+          {QUICK_ACTIONS.map((label) => <Chip key={label}>{t(label)}</Chip>)}
           <Pin n={3} className="-left-10 top-1/2 -translate-y-1/2" />
         </div>
 
         {/* 4 — the ask box */}
         <div className="relative mt-2">
           <div className="rounded-lg border border-border-subtle bg-bg-input px-2.5 py-1.5 text-[10px] text-text-secondary">
-            Ask anything on screen or conversation…
+            {t('Ask anything on screen or conversation…')}
           </div>
           <Pin n={4} className="-left-10 top-1/2 -translate-y-1/2" />
         </div>
@@ -207,7 +220,7 @@ export const OverlayAnatomyFigure: React.FC = () => (
         {/* 5–7 — the bottom row: each control carries its own callout */}
         <div className="mt-2 flex items-center gap-2">
           <span className="flex items-center gap-1 rounded-md border border-border-subtle bg-bg-item-surface px-2 py-0.5 text-[9.5px] font-medium text-text-primary">
-            Model <ChevronDown size={10} />
+            {t('Model')} <ChevronDown size={10} />
           </span>
           <HelpCallout n={5} />
           <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-md border border-border-subtle bg-bg-item-surface text-text-primary">
@@ -222,4 +235,5 @@ export const OverlayAnatomyFigure: React.FC = () => (
       </div>
     </div>
   </div>
-);
+  );
+};

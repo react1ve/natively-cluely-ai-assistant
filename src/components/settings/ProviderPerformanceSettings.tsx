@@ -90,10 +90,11 @@ const GRADE_LABEL: Record<Grade, string> = {
  * it. `high` is not shown at all — a grade with nothing next to it IS the
  * confident case, and a "high confidence" chip on every healthy row is noise.
  */
-function confidenceNote(c: Confidence, samples: number): string | null {
+function confidenceNote(c: Confidence, _samples: number): string | null {
     if (c === 'none') return 'no samples yet';
     if (c === 'low') return 'still learning';
-    if (c === 'medium') return `${samples} answers`;
+    // `{n}` is filled at the render site, after translation.
+    if (c === 'medium') return '{n} answers';
     return null;
 }
 
@@ -389,7 +390,7 @@ const MeasurementRow: React.FC<{ p: ProfileRow; t: (s: string) => string; older?
                         {/* A Refresh that re-grades a model swaps the word in place. */}
                         <Presence kind="text" id={p.grade}>{t(GRADE_LABEL[p.grade] ?? GRADE_LABEL.unknown)}</Presence>
                     </div>
-                    {note ? <div className="text-[11px] text-text-secondary">{t(note)}</div> : null}
+                    {note ? <div className="text-[11px] text-text-secondary">{t(note).replace('{n}', String(p.sampleCount))}</div> : null}
                 </div>
             }
         >

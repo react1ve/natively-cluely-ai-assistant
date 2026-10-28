@@ -501,7 +501,7 @@ const PairingCountdown: React.FC<{ deadline: number; total: number; onExpired: (
       role="status"
       aria-live="polite"
       aria-atomic="true"
-      aria-label={`Waiting for extension. Pairing window: ${remaining} seconds remaining.`}
+      aria-label={`${t('Waiting for extension')}. ${t('Pairing window: {n} seconds remaining.').replace('{n}', String(remaining))}`}
       className="bg-bg-card rounded-xl border border-border-subtle p-3 flex items-center gap-3"
     >
       <PairingCountdownRing seconds={remaining} deadline={deadline} total={total} textInk={textInk} />
@@ -1228,7 +1228,7 @@ export const PhoneMirrorSettings: React.FC = () => {
             />
           </Collapse>
 
-          {notice(!!error, dangerTone, <AlertCircle size={14} />, error, true, 'above')}
+          {notice(!!error, dangerTone, <AlertCircle size={14} />, error && t(error), true, 'above')}
         </section>
 
         {/* ── Browser Extension: talks to the same local server, so it needs
@@ -1287,7 +1287,7 @@ export const PhoneMirrorSettings: React.FC = () => {
                 )}
               </div>
             </Collapse>
-            {notice(!!armError, dangerTone, <AlertCircle size={14} />, armError, true)}
+            {notice(!!armError, dangerTone, <AlertCircle size={14} />, armError && t(armError), true)}
           </CompanionRow>
 
           <Collapse open={shownRunning}>
@@ -1351,7 +1351,7 @@ export const PhoneMirrorSettings: React.FC = () => {
               {t('Email, chat, banking, and sign-in pages are never captured, even if they look like a coding page.')}
             </span>
           </p>
-          {notice(!!ctxError, dangerTone, <AlertCircle size={14} />, ctxError, true, 'above')}
+          {notice(!!ctxError, dangerTone, <AlertCircle size={14} />, ctxError && t(ctxError), true, 'above')}
         </section>
       </div>
     </MotionReadyContext.Provider>

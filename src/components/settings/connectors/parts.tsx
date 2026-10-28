@@ -356,15 +356,15 @@ export const FolderSelect: React.FC<{ folders: FolderOption[]; value: string | n
 export const folderName = (folders: FolderOption[], id: string | null, all: string): string => (id ? folders.find((f) => f.id === id)?.name ?? all : all);
 
 /** "1 min ago", "3 h ago", "2 days ago", from a timestamp. */
-export function ago(at: number, now: number = Date.now()): string {
+export function ago(at: number, now: number = Date.now(), tr: (s: string) => string = (s) => s): string {
     const s = Math.max(0, Math.round((now - at) / 1000));
-    if (s < 60) return 'just now';
+    if (s < 60) return tr('just now');
     const m = Math.round(s / 60);
-    if (m < 60) return `${m} min ago`;
+    if (m < 60) return tr('{n} min ago').replace('{n}', String(m));
     const h = Math.round(m / 60);
-    if (h < 24) return `${h} h ago`;
+    if (h < 24) return tr('{n} h ago').replace('{n}', String(h));
     const d = Math.round(h / 24);
-    return d === 1 ? 'yesterday' : `${d} days ago`;
+    return d === 1 ? tr('yesterday') : tr('{n} days ago').replace('{n}', String(d));
 }
 
 /** What was last sent, and whether it got there. */
@@ -373,7 +373,7 @@ export const DeliveryLine: React.FC<{ delivery?: DeliveryInfo }> = ({ delivery }
     const tones = useSettingsTones();
     if (!delivery) return <span className="text-xs text-text-tertiary">{t('Nothing sent yet.')}</span>;
     const what = delivery.meetingTitle ? `“${delivery.meetingTitle}”` : t('a meeting');
-    if (delivery.status === 'success') return <span className="text-xs text-text-secondary">{t('Sent')} {what} {t(ago(delivery.at))}.</span>;
+    if (delivery.status === 'success') return <span className="text-xs text-text-secondary">{t('Sent')} {what} {ago(delivery.at, undefined, t)}.</span>;
     if (delivery.status === 'pending') return <span className="text-xs text-text-secondary">{t('Sending')} {what}…</span>;
     return <span className={`text-xs ${tones.text.danger}`}>{delivery.message || `${t('Could not send')} ${what}.`}</span>;
 };

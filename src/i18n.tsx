@@ -10,6 +10,7 @@ import { CREDENTIAL_STORES_RU, CREDENTIAL_STORES_ZH, CREDENTIAL_STORES_JA, CREDE
 import { TRIAL_NOTICE_RU, TRIAL_NOTICE_ZH, TRIAL_NOTICE_JA, TRIAL_NOTICE_ES } from './i18n.trial';
 import { ASSIST_RU, ASSIST_ZH, ASSIST_JA, ASSIST_ES } from './i18n.assist';
 import { AMBIENT_CHAT_RU, AMBIENT_CHAT_ZH, AMBIENT_CHAT_JA, AMBIENT_CHAT_ES } from './i18n.ambientChat';
+import { SETTINGS_RU } from './i18n.settings.ru';
 
 // ─── Lightweight in-house i18n ────────────────────────────────────────────────
 // No external dependency. `t(englishText)` returns the translation for the
@@ -57,6 +58,7 @@ const RU: Record<string, string> = {
     ...TRIAL_NOTICE_RU,
     ...ASSIST_RU,
     ...AMBIENT_CHAT_RU,
+    ...SETTINGS_RU,
     // ── Settings sidebar / navigation ──
     'General': 'Основные',
     'AI Providers': 'AI-провайдеры',

@@ -72,8 +72,10 @@ const trimVendorAttribution = (label: string): string => {
 const qualifiedModelName = (providerId: string, label: string): string =>
     `${providerId}/${bareModelName(label)}`;
 
-const PlatformMark: React.FC = () => (
-    <span className="aip-tile aip-tile--mark" aria-hidden="true" title={isMac ? 'macOS' : isWindows ? 'Windows' : 'This device'}>
+const PlatformMark: React.FC = () => {
+    const t = useT();
+    return (
+    <span className="aip-tile aip-tile--mark" aria-hidden="true" title={isMac ? 'macOS' : isWindows ? 'Windows' : t('This device')}>
         {isMac ? (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
@@ -86,14 +88,18 @@ const PlatformMark: React.FC = () => (
             <Monitor size={16} strokeWidth={1.75} />
         )}
     </span>
-);
+    );
+};
 
 /** The user-hosted endpoint has no vendor; a server glyph beats a monogram. */
-const CustomEndpointMark: React.FC = () => (
-    <span className="aip-tile aip-tile--mark" aria-hidden="true" title="Custom endpoint">
+const CustomEndpointMark: React.FC = () => {
+    const t = useT();
+    return (
+    <span className="aip-tile aip-tile--mark" aria-hidden="true" title={t('Custom endpoint')}>
         <Server size={16} strokeWidth={1.75} />
     </span>
-);
+    );
+};
 
 type RerankerProvider = 'local' | 'natively' | 'openrouter' | 'jina' | 'voyage' | 'custom';
 type ModelGroup = 'recommended' | 'quality' | 'fast' | 'multimodal' | 'other';
@@ -1093,26 +1099,26 @@ export const RerankerSettings: React.FC<RerankerSettingsProps> = ({ renderParts 
         try {
             const res = await window.electronAPI.installExtensionFromFolder?.();
             if (res && !res.success && res.error !== 'cancelled') {
-                setInstallError(res.errors?.join('; ') || res.error || 'Install failed.');
+                setInstallError(res.errors?.join('; ') || res.error || t('Install failed.'));
             }
             await loadExtensions();
         } finally {
             setInstalling(false);
         }
-    }, [loadExtensions]);
+    }, [loadExtensions, t]);
 
     const downloadModel = useCallback(async (id: string, modelKey: string) => {
         const key = `${id}::${modelKey}`;
         setBusyModel(key);
         try {
             const res = await window.electronAPI.downloadExtensionModel?.(id, modelKey);
-            if (res && !res.success) setInstallError(res.message || res.error || 'Download failed.');
+            if (res && !res.success) setInstallError(res.message || res.error || t('Download failed.'));
             await loadExtensions();
         } finally {
             setBusyModel(null);
             setProgress(prev => { const next = { ...prev }; delete next[key]; return next; });
         }
-    }, [loadExtensions]);
+    }, [loadExtensions, t]);
 
     const downloadExtensionGroup = useCallback(async (extId: string, files: ExtensionModel[]) => {
         for (const m of files) {
@@ -1560,7 +1566,7 @@ export const RerankerSettings: React.FC<RerankerSettingsProps> = ({ renderParts 
                                         data-size="sm"
                                         data-variant="ghost"
                                         onClick={() => window.electronAPI.openExternal?.(p.keyUrl)}
-                                        title={`Get ${p.name} API Key`}
+                                        title={t('Get {name} API Key').replace('{name}', p.name)}
                                     >
                                         <span className="uppercase tracking-wide">{t('Get Key')}</span>
                                         <ExternalLink size={12} strokeWidth={1.75} />

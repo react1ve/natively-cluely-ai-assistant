@@ -12,6 +12,7 @@ import {
   useSettingsTones,
 } from '../SettingsRow';
 import { copyText } from '../../../lib/copyText';
+import { useT } from '../../../i18n';
 
 // The pieces Setup & Help is written in. Every row is the shared SettingsRow —
 // General, Audio, Sync, Intelligence and About are built from the same one —
@@ -43,6 +44,7 @@ export const HelpGuideRow: React.FC<{
   children: React.ReactNode;
   defaultOpen?: boolean;
 }> = ({ icon, title, badge, description, children, defaultOpen = false }) => {
+  const t = useT();
   const [open, setOpen] = useState(defaultOpen);
   const bodyRef = useRef<HTMLDivElement>(null);
   const bodyId = useId();
@@ -64,7 +66,7 @@ export const HelpGuideRow: React.FC<{
             type="button"
             aria-expanded={open}
             aria-controls={bodyId}
-            aria-label={open ? `Hide ${title}` : `Show ${title}`}
+            aria-label={(open ? t('Hide {title}') : t('Show {title}')).replace('{title}', title)}
             className="w-7 h-7 rounded-full flex items-center justify-center text-text-secondary group-hover:text-text-primary group-hover:bg-bg-item-surface transition-colors"
           >
             <DisclosureChevron open={open} />
@@ -135,16 +137,31 @@ export const HelpLegend: React.FC<{ items: Array<{ title: string; body: React.Re
 );
 
 /** A place in the app — "Settings › Audio" — set as one chip so it scans as a path. */
-export const HelpPath: React.FC<{ parts: string[] }> = ({ parts }) => (
+export const HelpPath: React.FC<{ parts: string[] }> = ({ parts }) => {
+  const t = useT();
+  return (
   <span className="inline-flex items-center gap-0.5 align-baseline rounded-md border border-border-subtle bg-bg-item-surface px-1.5 py-px text-[11px] font-medium text-text-primary whitespace-nowrap">
     {parts.map((part, i) => (
       <React.Fragment key={i}>
         {i > 0 && <ChevronRight size={10} aria-hidden className="text-text-secondary" />}
-        <span>{part}</span>
+        <span>{t(part)}</span>
       </React.Fragment>
     ))}
   </span>
-);
+  );
+};
+
+/**
+ * A translated sentence with parts set inside it: each `{name}` in `text` is
+ * replaced by `slots[name]`, so a translation can move a key or a path chip to
+ * wherever its grammar puts it.
+ */
+export function helpFill(text: string, slots: Record<string, React.ReactNode>): React.ReactNode {
+  return text.split(/(\{\w+\})/).map((piece, i) => {
+    const m = /^\{(\w+)\}$/.exec(piece);
+    return m && m[1] in slots ? <React.Fragment key={i}>{slots[m[1]]}</React.Fragment> : piece;
+  });
+}
 
 // KeyRecorder's own arrow mapping, so a stored "ArrowUp" reads as it does there.
 const KEY_GLYPHS: Record<string, string> = { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' };
@@ -154,7 +171,8 @@ const KEY_GLYPHS: Record<string, string> = { ArrowUp: '↑', ArrowDown: '↓', A
  * in running text, so they drop to 20px to stay inside the 12px line.
  */
 export const HelpKeys: React.FC<{ keys: string[]; inline?: boolean }> = ({ keys, inline }) => {
-  if (keys.length === 0) return <span className="text-xs text-text-secondary">Not set</span>;
+  const t = useT();
+  if (keys.length === 0) return <span className="text-xs text-text-secondary">{t('Not set')}</span>;
   return (
     <span className={`${inline ? 'inline-flex align-middle mx-0.5' : 'flex'} items-center gap-1`}>
       {keys.map((k, i) => (
@@ -189,6 +207,7 @@ export const HelpDefinitions: React.FC<{ items: Array<{ term: string; detail: Re
 // reverting at the first one's deadline, and a refused write (writeText
 // REJECTS, it does not throw) says nothing instead of escaping unhandled.
 export const HelpCommand: React.FC<{ command: string }> = ({ command }) => {
+  const t = useT();
   const tones = useSettingsTones();
   const [copied, setCopied] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -210,7 +229,7 @@ export const HelpCommand: React.FC<{ command: string }> = ({ command }) => {
         type="button"
         onClick={() => void handleCopy()}
         className={`${SETTINGS_BTN_BASE} ${copied ? tones.ok : SETTINGS_BTN_NEUTRAL}`}
-        aria-label={copied ? 'Copied' : 'Copy command'}
+        aria-label={copied ? t('Copied') : t('Copy command')}
       >
         <Presence kind="icon" id={copied ? 'check' : 'copy'}>
           {copied ? <Check size={13} /> : <Copy size={13} />}
@@ -295,6 +314,7 @@ export const HelpClip: React.FC<{
   label: string;
   caption?: string;
 }> = ({ clip, label, caption }) => {
+  const t = useT();
   const reduce = usePrefersReducedMotion();
   const isLight = useResolvedTheme() === 'light';
   const guideOpen = React.useContext(HelpGuideOpen);
@@ -399,7 +419,7 @@ export const HelpClip: React.FC<{
           ref={videoRef}
           key={src}
           src={src}
-          aria-label={label}
+          aria-label={t(label)}
           className="block w-full h-full object-cover bg-bg-main"
           // Fades in on its first frame rather than flashing the empty frame black.
           style={{ opacity: ready ? 1 : 0, transition: reduce ? 'none' : 'opacity 250ms ease-out' }}
@@ -416,7 +436,7 @@ export const HelpClip: React.FC<{
         <button
           type="button"
           onClick={toggle}
-          aria-label={playing ? 'Pause recording' : 'Play recording'}
+          aria-label={playing ? t('Pause recording') : t('Play recording')}
           className={`absolute right-2.5 bottom-2.5 w-8 h-8 rounded-full flex items-center justify-center text-white bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-sm transition-opacity duration-200 focus-visible:opacity-100 focus-visible:outline-none ${
             playing ? 'opacity-0 group-hover/clip:opacity-100' : 'opacity-100'
           }`}
@@ -430,7 +450,7 @@ export const HelpClip: React.FC<{
         <ol
           className="grid gap-3"
           style={{ gridTemplateColumns: `repeat(${chapters.length}, minmax(0, 1fr))` }}
-          aria-label="Steps in this recording"
+          aria-label={t('Steps in this recording')}
         >
           {chapters.map((chapter, i) => {
             const isActive = i === active;
@@ -440,7 +460,7 @@ export const HelpClip: React.FC<{
                   type="button"
                   onClick={() => seek(i)}
                   aria-current={isActive ? 'step' : undefined}
-                  title={typeof chapter.label === 'string' ? chapter.label : undefined}
+                  title={typeof chapter.label === 'string' ? t(chapter.label) : undefined}
                   // Not ring-accent-primary/60: a bare var() colour takes no alpha
                   // suffix (tailwind.config.js), so that emitted nothing and the ring
                   // fell back to Tailwind's default blue.
@@ -469,7 +489,7 @@ export const HelpClip: React.FC<{
                         isActive ? 'text-text-primary font-medium' : 'text-text-secondary group-hover/step:text-text-primary'
                       }`}
                     >
-                      {chapter.label}
+                      {typeof chapter.label === 'string' ? t(chapter.label) : chapter.label}
                     </span>
                   </span>
                 </button>

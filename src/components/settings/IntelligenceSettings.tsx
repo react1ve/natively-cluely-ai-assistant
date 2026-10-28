@@ -926,7 +926,7 @@ export const IntelligenceSettings: React.FC = () => {
                             <>
                               <CopyBlock
                                 text="export LITELLM_BASE_URL=your-gateway-url"
-                                label="LiteLLM gateway:"
+                                label={t('LiteLLM gateway:')}
                               />
                               <span className="mt-1.5 block">
                                 {t('We detected a LiteLLM gateway URL in AI Providers. The launcher forwards it automatically when started from inside Natively; if you run the script yourself, also export the URL above.')}

@@ -365,6 +365,7 @@ function ResourceMeter({
   /** Show only the percentage, never the plan's allowance. */
   percentOnly?: boolean;
 }) {
+  const t = useT();
   // An absent meter is not zero usage — it is a response this build does not
   // understand, or one that has not arrived. Render nothing rather than a
   // confident 0%.
@@ -380,7 +381,7 @@ function ResourceMeter({
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
           {Icon && <Icon size={12} className="text-text-tertiary" strokeWidth={1.75} />}
-          <span className={`${sub ? 'text-[11px]' : 'text-[12px]'} text-text-secondary truncate`}>{label}</span>
+          <span className={`${sub ? 'text-[11px]' : 'text-[12px]'} text-text-secondary truncate`}>{t(label)}</span>
         </div>
         <span
           className={`${sub ? 'text-[11px]' : 'text-[12px]'} tabular-nums shrink-0 ${
@@ -391,10 +392,10 @@ function ResourceMeter({
               "Unlimited" in both readings rather than rendering an empty slot
               or a misleading 0%. */}
           {percentOnly ? (
-            meter.limit == null ? 'Unlimited' : `${Math.round(real)}%`
+            t(meter.limit == null ? 'Unlimited' : `${Math.round(real)}%`)
           ) : (
             <>
-              {formatMeter(meter)}
+              {formatMeter(meter).replace(/^Unlimited$/, t('Unlimited')).replace(/ min$/, ` ${t('min')}`)}
               {meter.limit != null && (
                 <span className="opacity-60"> · {Math.round(real)}%</span>
               )}
@@ -438,6 +439,7 @@ function ResourceMeter({
  * budget instead of three.
  */
 function KnowledgeUsage({ knowledge, percentOnly = false }: { knowledge: NativelyQuota['knowledge'] | undefined; percentOnly?: boolean }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   if (!knowledge) return null;
   const pct = Number.isFinite(knowledge.percent) ? knowledge.percent : 0;
@@ -462,7 +464,7 @@ function KnowledgeUsage({ knowledge, percentOnly = false }: { knowledge: Nativel
         >
           <Layers size={12} className="text-text-tertiary" strokeWidth={1.75} />
           <span className="text-[12px] text-text-secondary group-hover:text-text-primary transition-colors duration-150 motion-reduce:transition-none">
-            Knowledge Usage
+            {t('Knowledge Usage')}
           </span>
           <ChevronDown
             size={11}
@@ -519,16 +521,17 @@ function KnowledgeUsage({ knowledge, percentOnly = false }: { knowledge: Nativel
  * reranker" is information a buyer can act on where a summed number is not.
  */
 function PlanAllowances({ limits }: { limits: NativelyPlanLimits | undefined }) {
+  const t = useT();
   if (!limits) return null;
   const rows: Array<[string, string]> = [
-    ['AI', `${formatCompact(limits.ai_tokens)} tokens`],
-    ['Voice', `${limits.transcription_minutes.toLocaleString('en-US')} min`],
-    ['Knowledge', `${formatCompact(limits.embedding_tokens)} + ${formatCompact(limits.reranker_tokens)} tokens`],
+    ['AI', `${formatCompact(limits.ai_tokens)} ${t('tokens')}`],
+    ['Voice', `${limits.transcription_minutes.toLocaleString('en-US')} ${t('min')}`],
+    ['Knowledge', `${formatCompact(limits.embedding_tokens)} + ${formatCompact(limits.reranker_tokens)} ${t('tokens')}`],
     // Runs, not dollars (2026-09-21). The allowance is sold as a count of
     // complete company researches; the dollar figure underneath is the credit
     // budget that funds them and means nothing to a buyer on its own.
     ['Research', limits.research_runs != null
-      ? `${limits.research_runs} company researches`
+      ? `${limits.research_runs} ${t('company researches')}`
       : `${formatUsd(limits.research_credits_usd)}`],
   ];
   return (
@@ -537,7 +540,7 @@ function PlanAllowances({ limits }: { limits: NativelyPlanLimits | undefined }) 
       <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5">
         {rows.map(([label, value]) => (
           <React.Fragment key={label}>
-            <dt className="natively-api-on-fill-dim text-[10px] leading-snug opacity-80">{label}</dt>
+            <dt className="natively-api-on-fill-dim text-[10px] leading-snug opacity-80">{t(label)}</dt>
             <dd className="natively-api-on-fill-dim text-[10px] leading-snug tabular-nums text-right">{value}</dd>
           </React.Fragment>
         ))}
@@ -564,6 +567,7 @@ function PlanAllowances({ limits }: { limits: NativelyPlanLimits | undefined }) 
 // compact control on the right, on the `natively-key-card` plaque. Two states
 // of one feature should not be two different shapes.
 function ActiveTrialCard({ expiresAt, onOptions }: { expiresAt: string; onOptions: () => void }) {
+  const t = useT();
   const { clock, ended, isWarning } = useTrialRemaining(expiresAt);
   return (
     <div>
@@ -574,7 +578,7 @@ function ActiveTrialCard({ expiresAt, onOptions }: { expiresAt: string; onOption
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-medium text-text-primary tracking-[-0.01em]">
                 {ended ? (
-                  'Your free trial has ended'
+                  t('Your free trial has ended')
                 ) : (
                   <>
                     {/* The clock is the only part that moves, so it is the
@@ -585,14 +589,14 @@ function ActiveTrialCard({ expiresAt, onOptions }: { expiresAt: string; onOption
                         the usage rows use when an allowance runs low, so one
                         colour means one thing across the panel. */}
                     <span className={`tabular-nums transition-colors duration-500 ease-out ${isWarning ? 'text-amber-500' : ''}`}>{clock}</span>
-                    {' left in your free trial'}
+                    {t(' left in your free trial')}
                   </>
                 )}
               </p>
               <p className="text-[12px] text-text-secondary mt-1 leading-snug">
                 {ended
-                  ? 'Add a key or choose a plan to keep going.'
-                  : 'Your usage so far is below.'}
+                  ? t('Add a key or choose a plan to keep going.')
+                  : t('Your usage so far is below.')}
               </p>
             </div>
 
@@ -610,7 +614,7 @@ function ActiveTrialCard({ expiresAt, onOptions }: { expiresAt: string; onOption
               data-state="secondary"
               className="natively-key-cta shrink-0 h-9 px-5 flex items-center justify-center gap-1.5 text-[13px] font-medium select-none cursor-pointer"
             >
-              See your options
+              {t('See your options')}
               <ArrowUpRight size={14} strokeWidth={2.2} />
             </button>
           </div>
@@ -652,10 +656,11 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
 // headers, inline titles and uppercase micro-labels this tab used to open
 // every section with.
 function SectionLabel({ children, aside }: { children: React.ReactNode; aside?: React.ReactNode }) {
+  const t = useT();
   return (
     <div className="flex items-baseline justify-between gap-3 px-1 mb-2">
       <p className="text-[11px] font-medium text-text-tertiary uppercase tracking-[0.07em]">
-        {children}
+        {typeof children === 'string' ? t(children) : children}
       </p>
       {aside}
     </div>
@@ -1273,7 +1278,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
       {/* Segmented control selector tab bar */}
       <div
         role="tablist"
-        aria-label="Natively API plan tier"
+        aria-label={t('Natively API plan tier')}
         className="natively-api-selector-bar grid grid-cols-4 relative p-1 bg-black/10 dark:bg-white/5 border border-white/5 rounded-2xl overflow-hidden"
       >
         {/* Active sliding pill */}
@@ -1330,7 +1335,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
               className={`natively-api-selector-tab ${isSel ? 'active' : ''}`}
             >
               <span className="tab-name">{tab.name}</span>
-              <span className="tab-price">{displayPrice}</span>
+              <span className="tab-price">{displayPrice.replace('/mo', t('/mo'))}</span>
             </button>
           );
         })}
@@ -1409,7 +1414,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                       <div className="flex items-center gap-1.5 h-5">
                         {plan.badgeText && (
                           <span className="natively-api-fill-pill inline-flex items-center px-2 py-0.5 rounded-full text-[9.5px] font-semibold uppercase tracking-wider">
-                            {plan.badgeText}
+                            {t(plan.badgeText)}
                           </span>
                         )}
                       </div>
@@ -1418,7 +1423,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                         {plan.name}
                       </h4>
                       <p className="natively-api-on-fill-dim text-[11px] mt-1.5 leading-snug">
-                        {plan.description}
+                        {t(plan.description)}
                       </p>
 
                       {/* The one piece of high-contrast type. No per-tier
@@ -1430,13 +1435,13 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                         >
                           <RollingPrice price={price} from={prevPrice} />
                         </span>
-                        <span className="natively-api-on-fill-dim text-[12px] font-medium">/ month</span>
+                        <span className="natively-api-on-fill-dim text-[12px] font-medium">{t('/ month')}</span>
                       </div>
 
                       <div className="mt-auto pt-3">
                         {isActive ? (
                           <div className="w-full natively-api-active-tag text-center rounded-full text-[12.5px] font-semibold select-none flex items-center justify-center">
-                            Active Plan
+                            {t('Active Plan')}
                           </div>
                         ) : (
                           <button
@@ -1453,7 +1458,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                                     : 'natively-api-pricing-cta-neutral'
                             }`}
                           >
-                            Get Started with {plan.name} <ArrowUpRight size={14} strokeWidth={2.5} />
+                            {t('Get Started with {plan}').replace('{plan}', plan.name)} <ArrowUpRight size={14} strokeWidth={2.5} />
                           </button>
                         )}
                       </div>
@@ -1462,7 +1467,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                     {/* Right: what you get, all in low-contrast gray */}
                     <div className="flex flex-col min-w-0">
                       <p className="natively-api-on-fill-dim text-[9px] font-semibold uppercase tracking-[0.14em]">
-                        What's included
+                        {t("What's included")}
                       </p>
                       <div className="natively-api-body-rule h-px mt-2 mb-2.5" />
                       <ul className="space-y-2">
@@ -1473,13 +1478,13 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                               <span className="natively-api-feature-badge shrink-0 w-[18px] h-[18px] rounded-full flex items-center justify-center">
                                 <FeatureIcon size={10} strokeWidth={2.2} />
                               </span>
-                              <span className="min-w-0">{feature}</span>
+                              <span className="min-w-0">{t(feature)}</span>
                             </li>
                           );
                         })}
                       </ul>
                       <p className="natively-api-on-fill-dim mt-auto pt-3 text-[10px] leading-snug opacity-80">
-                        {plan.note}
+                        {t(plan.note)}
                       </p>
                     </div>
                   </div>
@@ -1615,7 +1620,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                           nothing to read before you start one. Same reason the
                           allowances come from TRIAL_FALLBACK_LIMITS. */}
                       <p className="text-[15px] font-medium text-text-primary tracking-[-0.01em]">
-                        Try the Natively API free for 30 minutes
+                        {t('Try the Natively API free for 30 minutes')}
                       </p>
                       {/* Allowances at the description weight the rest of this
                           tab uses for a card's second line, not the 11px
@@ -1623,12 +1628,12 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                           compares against the plans below. Tabular figures so
                           the digits line up with the usage and price rows. */}
                       <p className="text-[12px] text-text-secondary mt-1 leading-snug tabular-nums">
-                        {formatCompact(TRIAL_FALLBACK_LIMITS.ai_tokens)} AI tokens
-                        {' · '}{TRIAL_FALLBACK_LIMITS.stt_minutes} min voice
+                        {formatCompact(TRIAL_FALLBACK_LIMITS.ai_tokens)} {t('AI tokens')}
+                        {' · '}{TRIAL_FALLBACK_LIMITS.stt_minutes} {t('min voice')}
                         {/* "research", not "searches": that is what the usage
                             pill, the usage table and the plan copy all call
                             this meter. One name per meter. */}
-                        {' · '}{TRIAL_FALLBACK_LIMITS.search_requests} research
+                        {' · '}{TRIAL_FALLBACK_LIMITS.search_requests} {t('research')}
                       </p>
                     </div>
 
@@ -1648,16 +1653,16 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                     {/* The pill keeps the wider label's width through the swap. */}
                     <SwapLabel
                       id={trialLoading ? 'starting' : isClaimed ? 'claimed' : 'start'}
-                      sizers={['Start free trial', <span className="flex items-center gap-2"><span className="w-[13px]" /> Starting…</span>]}
+                      sizers={[t('Start free trial'), <span className="flex items-center gap-2"><span className="w-[13px]" /> {t('Starting…')}</span>]}
                     >
                       {trialLoading ? (
                         <span className="flex items-center gap-2">
-                          <Loader2 size={13} className="animate-spin" /> Starting…
+                          <Loader2 size={13} className="animate-spin" /> {t('Starting…')}
                         </span>
                       ) : isClaimed ? (
-                        'Already claimed'
+                        t('Already claimed')
                       ) : (
-                        'Start free trial'
+                        t('Start free trial')
                       )}
                     </SwapLabel>
                     </button>
@@ -1674,7 +1679,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                       transition={{ duration: INK.in, ease: EASE_ENTER, delay: prefersReducedMotion ? 0 : BEAT }}
                     >
                       <AlertCircle size={13} className="text-[var(--text-danger)] shrink-0" strokeWidth={2} />
-                      <p className="text-[12px] text-[var(--text-danger)]">{trialError}</p>
+                      <p className="text-[12px] text-[var(--text-danger)]">{t(trialError)}</p>
                     </motion.div>
                   )}
                 </div>
@@ -1694,14 +1699,14 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
               <div className="flex items-center gap-3 shrink-0">
                 <span className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-500">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  {planLabel ?? 'Connected'}
+                  {planLabel ?? t('Connected')}
                 </span>
                 <button
                   onClick={handleClear}
                   className="flex items-center gap-1 text-[11px] text-text-tertiary hover:text-[var(--text-danger)] transition-colors duration-150 cursor-pointer motion-reduce:transition-none"
                 >
                   <Trash2 size={11} strokeWidth={2} />
-                  Remove
+                  {t('Remove')}
                 </button>
               </div>
             ) : undefined
@@ -1723,7 +1728,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                 disappears the moment you type. No mark beside it: the section
                 label above is still the heading. */}
             <p className="natively-key-sub text-[12px] leading-snug">
-              Activate with a Natively API key or a Natively Pro license.
+              {t('Activate with a Natively API key or a Natively Pro license.')}
             </p>
 
             {/* The input is the subject of this card. It's now a pressed-in
@@ -1746,7 +1751,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                 setError(null);
               }}
               onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-              placeholder="Natively API key or Natively Pro license"
+              placeholder={t('Natively API key or Natively Pro license')}
               spellCheck={false}
               autoComplete="off"
               data-invalid={error ? 'true' : 'false'}
@@ -1767,7 +1772,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                 transition={{ duration: INK.in, ease: EASE_ENTER, delay: prefersReducedMotion ? 0 : BEAT }}
               >
                 <AlertCircle size={13} className="shrink-0" />
-                {error}
+                {t(error)}
               </motion.div>
             )}
 
@@ -1782,7 +1787,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                 transition={{ duration: INK.in, ease: EASE_ENTER, delay: prefersReducedMotion ? 0 : BEAT }}
               >
                 <AlertCircle size={13} className="shrink-0 mt-[2px]" />
-                {proNotice}
+                {t(proNotice)}
               </motion.div>
             )}
 
@@ -1814,20 +1819,20 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
               {isSaving ? (
                 <span className="flex items-center justify-center gap-2">
                   <Loader2 size={13} className="animate-spin" />
-                  Activating…
+                  {t('Activating…')}
                 </span>
               ) : justSaved ? (
                 <span className="flex items-center justify-center gap-2">
                   <CheckCircle size={13} />
-                  Saved
+                  {t('Saved')}
                 </span>
               ) : justActivatedPro ? (
                 <span className="flex items-center justify-center gap-2">
                   <CheckCircle size={13} />
-                  Pro activated
+                  {t('Pro activated')}
                 </span>
               ) : (
-                'Activate'
+                t('Activate')
               )}
               </CtaLabel>
             </button>
@@ -1838,12 +1843,12 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
             one" prompt that used to lead this line is gone — the plan chooser
             directly below is the same call to action, stated better. */}
         <p className="text-[11px] text-text-tertiary leading-relaxed mt-2.5 px-1 text-center">
-          By activating, you agree to our{' '}
+          {t('By activating, you agree to our')}{' '}
           <span
             onClick={() => openExternal('https://natively.software/nativelyapi/t&c')}
             className="text-text-secondary hover:text-text-primary underline decoration-border-muted underline-offset-[3px] cursor-pointer transition-colors duration-150 motion-reduce:transition-none"
           >
-            Terms &amp; Conditions
+            {t('Terms & Conditions')}
           </span>
           .
         </p>
@@ -1970,13 +1975,13 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
             aside={
               <span className="flex items-center gap-2 shrink-0">
                 <span className="text-[11px] text-text-tertiary">
-                  Resets {fmtDate(usageData.quota.resets_at)}
+                  {t('Resets {date}').replace('{date}', fmtDate(usageData.quota.resets_at))}
                 </span>
                 <button
                   onClick={() => fetchUsage({ force: true })}
                   disabled={isLoadingUsage}
-                  title="Refresh"
-                  aria-label="Refresh usage"
+                  title={t('Refresh')}
+                  aria-label={t('Refresh usage')}
                   className="flex items-center justify-center w-5 h-5 rounded-md text-text-tertiary
                                 hover:text-text-secondary transition-colors duration-150 motion-reduce:transition-none
                                 disabled:opacity-40 cursor-pointer shrink-0"
@@ -2054,7 +2059,7 @@ export const NativelyApiSettings: React.FC<NativelyApiSettingsProps> = ({ initia
                 tier bar follows the title directly; -mt-3 takes the body's
                 top padding down to How it works' spacing. */}
             <AccordionSection
-              title="Change plan"
+              title={t('Change plan')}
               className="natively-key-card bg-bg-item-surface rounded-2xl border-border-subtle !mb-0"
               divider={false}
               hoverFill={false}

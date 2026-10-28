@@ -2470,6 +2470,7 @@ export const AipSelect: React.FC<AipSelectProps> = ({
     value, options, onChange, label, placeholder, emptyLabel,
     disabled = false, disabledHint, className = '',
 }) => {
+    const t = useT();
     const [open, setOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
     const listRef = useRef<HTMLDivElement>(null);
@@ -2582,7 +2583,7 @@ export const AipSelect: React.FC<AipSelectProps> = ({
                             </div>
                         ))}
                         {options.length === 0 && (
-                            <div className="aip-select-empty">{emptyLabel ?? 'No options'}</div>
+                            <div className="aip-select-empty">{emptyLabel ?? t('No options')}</div>
                         )}
                     </div>
                 </div>
@@ -6614,7 +6615,7 @@ export const AIProvidersSettings: React.FC<AIProvidersSettingsProps> = ({
                             <AipSwitch
                                 checked={!disabledProviders.includes('custom')}
                                 onChange={() => handleToggleProvider('custom', disabledProviders.includes('custom'))}
-                                label={`${disabledProviders.includes('custom') ? t('Enable') : t('Disable')} custom providers`}
+                                label={disabledProviders.includes('custom') ? t('Enable custom providers') : t('Disable custom providers')}
                                 title={disabledProviders.includes('custom') ? t('Enable custom providers') : t('Disable custom providers (keeps them saved)')}
                             />
                         )}

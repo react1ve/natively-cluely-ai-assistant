@@ -171,10 +171,10 @@ export const ProviderCard: React.FC<ProviderCardProps> = ({
                     }
                 }
             } else {
-                setFetchError(result?.error || 'Failed to fetch models');
+                setFetchError(result?.error || t('Failed to fetch models'));
             }
         } catch (e: any) {
-            setFetchError(e.message || 'Failed to fetch models');
+            setFetchError(e.message || t('Failed to fetch models'));
         } finally {
             setIsFetching(false);
         }

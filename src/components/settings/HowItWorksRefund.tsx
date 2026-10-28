@@ -4,6 +4,7 @@ import { CalendarClock, CalendarX, CirclePlay, Clock3, FileText, Gauge, HandCoin
 import { AccordionSection } from '../ui/AccordionSection';
 import { LiquidGlassButton } from '../../ui-components/LiquidGlassButton';
 import { AFFILIATE_PROGRAM_URL, CREATORS_PROGRAM_URL } from '../../lib/partnerLinks';
+import { useT } from '../../i18n';
 import './HowItWorksRefund.css';
 
 // Extracted from NativelyApiSettings so PlansSettings can order this AFTER the
@@ -127,6 +128,7 @@ function IndigoSwitch<T extends string>({
   onChange: (id: T) => void;
   capRadius: number;
 }) {
+  const t = useT();
   const refs = useRef<Partial<Record<T, HTMLButtonElement | null>>>({});
   const index = Math.max(0, items.findIndex((item) => item.id === value));
   const count = items.length;
@@ -149,7 +151,7 @@ function IndigoSwitch<T extends string>({
   return (
     <div
       role="tablist"
-      aria-label={label}
+      aria-label={t(label)}
       onKeyDown={onKeyDown}
       className="relative grid rounded-full border border-border-subtle bg-bg-input p-1"
       style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}
@@ -184,8 +186,8 @@ function IndigoSwitch<T extends string>({
             // hover-ins are quicker than the arrival.
             className={`relative z-10 rounded-full px-3 py-1.5 text-center outline-none ${selected ? 'text-white duration-[250ms]' : 'text-text-secondary hover:text-text-primary duration-150'} transition-colors ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none`}
           >
-            <span className="block text-xs font-semibold">{item.name}</span>
-            {item.sub ? <span className="block text-[11px] font-medium">{item.sub}</span> : null}
+            <span className="block text-xs font-semibold">{t(item.name)}</span>
+            {item.sub ? <span className="block text-[11px] font-medium">{t(item.sub)}</span> : null}
           </button>
         );
       })}
@@ -360,6 +362,7 @@ const PartPanels: React.FC<{ part: PartId; dir: SwitchDir; content: Record<PartI
 };
 
 export const HowItWorksRefund: React.FC = () => {
+  const t = useT();
   const reduceMotion = useReducedMotion();
   const [{ part, dir }, setView] = useState<{ part: PartId; dir: SwitchDir }>({ part: 'how', dir: 0 });
   const setPart = (next: PartId) => {
@@ -378,7 +381,7 @@ export const HowItWorksRefund: React.FC = () => {
   const howItWorks = (
     <>
       {STEPS.map((step, i) => (
-        <StepRow key={step.title} n={i + 1} title={step.title} body={step.body} />
+        <StepRow key={step.title} n={i + 1} title={t(step.title)} body={t(step.body)} />
       ))}
       {/* The demo is the next thing to do after reading the steps, so it
           follows them, centred, as the same indigo Liquid Glass button as Manage
@@ -391,7 +394,7 @@ export const HowItWorksRefund: React.FC = () => {
           icon={<CirclePlay size={14} />}
           onClick={() => openExternal(DEMO_URL)}
         >
-          Watch the demo
+          {t('Watch the demo')}
         </LiquidGlassButton>
       </div>
     </>
@@ -401,10 +404,10 @@ export const HowItWorksRefund: React.FC = () => {
     <IconRow
       key={title}
       icon={<Icon size={20} />}
-      title={title}
-      description={body}
+      title={t(title)}
+      description={t(body)}
       control={figure ? (
-        <span className="text-sm font-semibold tabular-nums text-text-primary whitespace-nowrap">{figure}</span>
+        <span className="text-sm font-semibold tabular-nums text-text-primary whitespace-nowrap">{t(figure)}</span>
       ) : undefined}
     />
   ));
@@ -413,33 +416,33 @@ export const HowItWorksRefund: React.FC = () => {
     <>
       <IconRow
         icon={<CalendarX size={20} />}
-        title="Cancel or change your plan"
-        description="Do it in the customer portal any time before your renewal date."
+        title={t('Cancel or change your plan')}
+        description={t('Do it in the customer portal any time before your renewal date.')}
         control={(
           // Indigo: .lg-sky, the light Liquid Glass material, fed this
           // section's theme-aware indigo (HowItWorksRefund.css).
           <LiquidGlassButton variant="sky" className="lg-sm" style={INDIGO_BUTTON_STYLE} onClick={() => openExternal(PORTAL_URL)}>
-            Manage
+            {t('Manage')}
           </LiquidGlassButton>
         )}
       />
       <IconRow
         icon={<FileText size={20} />}
-        title="Full refund policy"
-        description="Subscriptions, taxes, fees and your local consumer rights."
+        title={t('Full refund policy')}
+        description={t('Subscriptions, taxes, fees and your local consumer rights.')}
         control={(
           <button type="button" onClick={() => openExternal(POLICY_URL)} className={actionButton}>
-            Open <LearnChevron />
+            {t('Open')} <LearnChevron />
           </button>
         )}
       />
       <IconRow
         icon={<Mail size={20} />}
-        title="Questions or problems?"
-        description={`Email ${CONTACT_EMAIL} rather than disputing a charge.`}
+        title={t('Questions or problems?')}
+        description={t('Email {email} rather than disputing a charge.').replace('{email}', CONTACT_EMAIL)}
         control={(
           <button type="button" onClick={() => openExternal(`mailto:${CONTACT_EMAIL}`)} className={actionButton}>
-            Email <LearnChevron />
+            {t('Email')} <LearnChevron />
           </button>
         )}
       />
@@ -454,8 +457,7 @@ export const HowItWorksRefund: React.FC = () => {
             <Heart size={20} className="text-[#EE82B0]" fill="currentColor" />
           </div>
           <p className="min-w-0 text-xs text-text-secondary">
-            Natively is built and supported by one person, in their free time. Replies can take a
-            few days, and weekends are offline. Thank you for your patience.
+            {t('Natively is built and supported by one person, in their free time. Replies can take a few days, and weekends are offline. Thank you for your patience.')}
           </p>
         </div>
       </div>
@@ -466,8 +468,8 @@ export const HowItWorksRefund: React.FC = () => {
 
   return (
     <AccordionSection
-      title="How it works & refund policy"
-      description="Setup steps, refund rules and how to cancel."
+      title={t('How it works & refund policy')}
+      description={t('Setup steps, refund rules and how to cancel.')}
       className="natively-key-card bg-bg-item-surface rounded-2xl border-border-subtle !mb-0"
       divider={false}
       hoverFill={false}
@@ -477,7 +479,7 @@ export const HowItWorksRefund: React.FC = () => {
       <div className="-mx-5 -mt-3 -mb-2">
         <div className="px-[17px] pb-2">
           <IndigoSwitch
-            label="How it works and refund policy"
+            label={t('How it works and refund policy')}
             idPrefix="hiw-part"
             items={PARTS}
             value={part}
@@ -503,14 +505,15 @@ export const HowItWorksRefund: React.FC = () => {
  * shows no rate, so neither does this), as on the launcher's program cards.
  */
 export const PartnerPrograms: React.FC = () => {
+  const t = useT();
   const openExternal = (url: string) => {
     (window.electronAPI as any)?.openExternal?.(url);
   };
 
   return (
     <AccordionSection
-      title="Earn with Natively"
-      description="Share Natively and get paid, or get Ultra free."
+      title={t('Earn with Natively')}
+      description={t('Share Natively and get paid, or get Ultra free.')}
       className="natively-key-card bg-bg-item-surface rounded-2xl border-border-subtle !mb-0"
       divider={false}
       hoverFill={false}
@@ -522,21 +525,21 @@ export const PartnerPrograms: React.FC = () => {
       <div className="-mx-5 -mt-5 -mb-4">
         <IconRow
           icon={<HandCoins size={20} />}
-          title="Affiliate program"
-          description="A commission on every sale you refer. Each click counts for 30 days."
+          title={t('Affiliate program')}
+          description={t('A commission on every sale you refer. Each click counts for 30 days.')}
           control={(
             <LiquidGlassButton variant="sky" className="lg-sm" style={INDIGO_BUTTON_STYLE} onClick={() => openExternal(AFFILIATE_PROGRAM_URL)}>
-              Join
+              {t('Join')}
             </LiquidGlassButton>
           )}
         />
         <IconRow
           icon={<Megaphone size={20} />}
-          title="Creator program"
-          description="Post about Natively in your own words. At 5,000 views, a month of Ultra is yours."
+          title={t('Creator program')}
+          description={t('Post about Natively in your own words. At 5,000 views, a month of Ultra is yours.')}
           control={(
             <LiquidGlassButton variant="sky" className="lg-sm" style={INDIGO_BUTTON_STYLE} onClick={() => openExternal(CREATORS_PROGRAM_URL)}>
-              Open
+              {t('Open')}
             </LiquidGlassButton>
           )}
         />
