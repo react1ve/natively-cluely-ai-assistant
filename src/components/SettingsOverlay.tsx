@@ -13,7 +13,6 @@ import {
     Plug, AppWindow
 } from 'lucide-react';
 import { AutoAnswerIcon } from './AutoAnswerIcon';
-import { HiCreditCard } from 'react-icons/hi2';
 import { analytics } from '../lib/analytics/analytics.service';
 import { AboutSection } from './AboutSection';
 import { ErrorBoundary } from './ErrorBoundary';
@@ -2340,14 +2339,6 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
                                     >
                                         {activeTab === 'general' && navActivePill}
                                         <Monitor size={16} /> {t('General')}
-                                    </button>
-                                    <button
-                                        onClick={() => setActiveTab('plans')}
-                                        className={navItemClass(activeTab === 'plans' || activeTab === 'natively-api' || activeTab === 'natively-pro')}
-                                    >
-                                        {(activeTab === 'plans' || activeTab === 'natively-api' || activeTab === 'natively-pro') && navActivePill}
-                                        <HiCreditCard size={16} />
-                                        <span>{t('Plans & Billing')}</span>
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('ai-providers')}
