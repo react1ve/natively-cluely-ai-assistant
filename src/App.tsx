@@ -42,7 +42,7 @@ import { cardInputsFromSources } from './lib/cards/cardInputs.mjs'
 import { forcedCardFromQuery } from './lib/onboarding/devOverrides.ts'
 import { isMac } from "./utils/platformUtils"
 import { trackAppOpen } from "./lib/toasterGating"
-import { PREMIUM_ADS_AVAILABLE } from './premium'
+import { PREMIUM_ADS_AVAILABLE, PREMIUM_MODES_AVAILABLE } from './premium'
 import { analytics } from "./lib/analytics/analytics.service"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import ModesSettings from "./components/settings/ModesSettings"
@@ -1436,7 +1436,7 @@ const App: React.FC = () => {
                     onStartMeeting={handleStartMeeting}
                     onOpenSettings={(tab = 'general') => openSettingsExclusive(tab)}
                     onOpenProfile={() => openProfileExclusive()}
-                    onOpenModes={() => openModesExclusive()}
+                    onOpenModes={PREMIUM_MODES_AVAILABLE ? () => openModesExclusive() : undefined}
                     onPageChange={setIsLauncherMainView}
                     ollamaPullStatus={ollamaPullStatus}
                     ollamaPullPercent={ollamaPullPercent}
@@ -1453,7 +1453,7 @@ const App: React.FC = () => {
                   initialIsPremium={hasLoadedLicense ? isPremiumActive : null}
                   initialHasNativelyKey={hasNativelyApi}
                   closeInstantly={isManagerOpen}
-                  onOpenModes={openModesExclusive}
+                  onOpenModes={PREMIUM_MODES_AVAILABLE ? openModesExclusive : undefined}
                   onOpenProfile={openProfileExclusive}
                   onOpenSearch={openLauncherSearch}
                   onOpenMeeting={openLauncherMeeting}

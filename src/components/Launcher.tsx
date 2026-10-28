@@ -785,6 +785,7 @@ const Launcher: React.FC<LauncherProps> = ({ request, onStartMeeting, onOpenSett
                             )}
                         </AnimatePresence>
                     </div>
+                    {onOpenModes && (
                     <div className="relative group/modes-btn select-none">
                         <button
                             data-testid="open-modes-manager"
@@ -888,6 +889,7 @@ const Launcher: React.FC<LauncherProps> = ({ request, onStartMeeting, onOpenSett
                             )}
                         </AnimatePresence>
                     </div>
+                    )}
                     <button
                         onClick={() => {
                             onOpenSettings();

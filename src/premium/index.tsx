@@ -55,6 +55,11 @@ const _modesSettings = import.meta.glob<any>(
   '../../premium/src/ModesSettings.tsx',
   { eager: true }
 );
+/**
+ * The Modes manager is in this build. Without it ModesSettings renders nothing,
+ * so every way into Modes is hidden rather than opening an empty dialog.
+ */
+export const PREMIUM_MODES_AVAILABLE = Object.keys(_modesSettings).length > 0;
 const _roleInsight = import.meta.glob<any>(
   '../../premium/src/RoleInsightPanel.tsx',
   { eager: true }
