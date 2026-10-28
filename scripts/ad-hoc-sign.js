@@ -308,14 +308,22 @@ exports.default = async function (context) {
     // top-level executable (what V8's JIT needs); --deep ad-hoc-signs the nested
     // frameworks, helpers, dylibs and .node. NOTHING is re-signed after this, so the
     // bundle's seal stays valid.
-    console.log(`[Ad-Hoc Signing] Signing main app ${appPath} with entitlements...`);
+    // An ad-hoc signature's designated requirement is its cdhash, so every rebuild
+    // is a new app to TCC: Screen Recording and Microphone are asked for again
+    // although System Settings still shows them allowed. NATIVELY_LOCAL_SIGN_IDENTITY
+    // names a stable local certificate (e.g. a self-signed "Natively Dev" code-signing
+    // cert in the login keychain); the requirement is then that certificate, and
+    // grants survive rebuilds. Same flow otherwise: not Developer ID, not notarized.
+    const localIdentity = (process.env.NATIVELY_LOCAL_SIGN_IDENTITY || '').trim();
+    const signArg = localIdentity ? JSON.stringify(localIdentity) : '-';
+    console.log(`[Ad-Hoc Signing] Signing main app ${appPath} with entitlements${localIdentity ? ` as "${localIdentity}"` : ''}...`);
 
     try {
         // --force: replace existing signature
         // --deep: sign nested code (frameworks, helpers, .dylib, .node)
         // --entitlements: attach entitlements to the top-level app bundle
-        // --sign -: ad-hoc signature
-        execSync(`codesign --force --deep ${hardenedOpt}--entitlements "${entitlementsPath}" --sign - "${appPath}"`, { stdio: 'inherit' });
+        // --sign -: ad-hoc signature (or the local identity above)
+        execSync(`codesign --force --deep ${hardenedOpt}--entitlements "${entitlementsPath}" --sign ${signArg} "${appPath}"`, { stdio: 'inherit' });
         console.log('[Ad-Hoc Signing] Successfully signed the application with entitlements.');
     } catch (error) {
         console.error('[Ad-Hoc Signing] Failed to sign the application:', error);
