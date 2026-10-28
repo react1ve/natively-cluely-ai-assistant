@@ -138,3 +138,29 @@ if (modified) {
 } else {
   console.log('[patch-electron-plist] No changes needed.');
 }
+
+// Editing Info.plist breaks Electron.app's signature ("code has no resources
+// but signature indicates they must be present"). TCC cannot match a bundle
+// with a broken signature to its grant, so every `npm run app:dev` asked for
+// Screen Recording and Microphone again although System Settings showed them
+// allowed. Re-seal the bundle whenever it does not verify: ad-hoc, or with
+// NATIVELY_LOCAL_SIGN_IDENTITY (see scripts/ad-hoc-sign.js) so grants also
+// survive an Electron reinstall. macOS only; codesign does not exist elsewhere.
+if (process.platform === 'darwin') {
+  const { execFileSync } = require('child_process');
+  const appPath = path.resolve(plistPath, '..', '..');
+  let valid = false;
+  try {
+    execFileSync('codesign', ['--verify', '--strict', appPath], { stdio: 'ignore' });
+    valid = true;
+  } catch { /* broken or missing signature */ }
+  if (!valid || modified) {
+    const identity = (process.env.NATIVELY_LOCAL_SIGN_IDENTITY || '').trim() || '-';
+    try {
+      execFileSync('codesign', ['--force', '--deep', '--sign', identity, appPath], { stdio: 'inherit' });
+      console.log(`[patch-electron-plist] Re-signed Electron.app (${identity === '-' ? 'ad-hoc' : identity}).`);
+    } catch (e) {
+      console.warn(`[patch-electron-plist] Could not re-sign Electron.app: ${e.message}`);
+    }
+  }
+}
