@@ -4156,12 +4156,33 @@ export const AIProvidersSettings: React.FC<AIProvidersSettingsProps> = ({
     };
 
 
+    // The Active Model picker's options. A saved local or proxy pick stays shown
+    // while its server's list is still loading (the stale-default check below
+    // keeps it for the same reason), instead of the picker reading as empty.
+    const buildActiveModelOptions = () => {
+        const opts = buildAvailableModelOptions();
+        if (/^(ollama-|litellm\/|ninerouter\/)/.test(defaultModel) && !opts.some((o) => o.id === defaultModel)) {
+            const name = defaultModel.startsWith('ollama-') ? `${defaultModel.slice('ollama-'.length)} (Local)` : defaultModel;
+            opts.push({ id: defaultModel, name });
+        }
+        return opts;
+    };
+
     // Keep the persisted default model from pointing at a provider the user just
     // removed/signed out of. This turns credential changes into immediate routing
     // changes instead of waiting for a failing request to discover stale state.
     useEffect(() => {
         if (!credentialsLoaded) return;
         if (defaultModel.startsWith('antigravity:') && antigravityStatus.signedIn && antigravityError) return;
+        // A local or proxy model is listed only once its server answers: Ollama is
+        // checked without being awaited before credentialsLoaded, LiteLLM and 9Router
+        // load in their own effects. An id missing from the list is then "not loaded
+        // yet", not "gone", and main's modelAvailable() keeps these too. Replacing it
+        // here wrote a cloud model over the user's local pick every time AI Providers
+        // opened, and the next launch restored that one.
+        if (defaultModel.startsWith('ollama-') && isProviderEnabled('ollama')) return;
+        if (defaultModel.startsWith('litellm/') && hasStoredKey.litellm && isProviderEnabled('litellm')) return;
+        if (defaultModel.startsWith('ninerouter/') && hasStoredKey.ninerouter && isProviderEnabled('ninerouter')) return;
         const opts = buildAvailableModelOptions();
         if (!defaultModel || opts.some(o => o.id === defaultModel) || opts.length === 0) return;
         // A Codex model that is no longer offered (the CLI catalogue dropped it,
@@ -5360,7 +5381,7 @@ export const AIProvidersSettings: React.FC<AIProvidersSettingsProps> = ({
                         containerClassName={AIP_ACTIVE_SELECT_CONTAINER}
                         minLabel={HERO_MODEL_PICKER_MIN_LABEL}
                         value={defaultModel}
-                        options={buildAvailableModelOptions()}
+                        options={buildActiveModelOptions()}
                         onChange={(val) => {
                             setDefaultModel(val);
                             // @ts-ignore - persist as default + update runtime + broadcast
