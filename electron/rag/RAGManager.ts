@@ -11,7 +11,7 @@ import type { AppAPIConfig } from './EmbeddingProviderResolver';
 import { EmbeddingPipeline } from './EmbeddingPipeline';
 import { RAGRetriever } from './RAGRetriever';
 import { LiveRAGIndexer } from './LiveRAGIndexer';
-import { buildRAGPrompt, NO_CONTEXT_FALLBACK, NO_GLOBAL_CONTEXT_FALLBACK } from './prompts';
+import { buildRAGPrompt, NO_CONTEXT_FALLBACK } from './prompts';
 import type { ProviderDataScopePolicy } from '../llm/ProviderRouter';
 import { isSpokenSavedLine } from '../intelligence/savedTranscriptOrigin';
 import { buildSummaryTextForSearch } from './summaryTextForSearch';
@@ -30,6 +30,8 @@ import { runObservedMeetingDelete } from '../db/meetingDeleteObservers';
  * callback-based onToken() the shared helper uses.
  */
 const RAG_STREAM_STALL_MS = 15_000;
+/** The Home question's embedding budget; same as EmbeddingPipeline's warm-query budget. */
+const GLOBAL_QUERY_EMBED_BUDGET_MS = 1_500;
 
 /**
  * Appended to a queryMeeting/queryGlobal stream when it ends early (capped or
@@ -400,16 +402,25 @@ export class RAGManager {
             throw new Error('LLM helper not initialized');
         }
 
-        // Retrieve from all meetings, or from the folder's
-        const context = await this.retriever.retrieveGlobal(query, scope ? { meetingIds: scope.meetingIds } : {});
+        // Retrieve from all meetings, or from the folder's. The query embedding
+        // gets the warm-query budget (2026-10-28): without one it ran the full
+        // retry ladder, up to ~13 s before the model was even asked, on every
+        // Home question. A miss just means no excerpts; the model still answers.
+        const context = await this.retriever.retrieveGlobal(query, {
+            ...(scope ? { meetingIds: scope.meetingIds } : {}),
+            queryEmbedRetryBudgetMs: GLOBAL_QUERY_EMBED_BUDGET_MS,
+        });
 
         // ALWAYS ANSWER (2026-09-07, owner's direction): an empty global search
         // used to yield NO_GLOBAL_CONTEXT_FALLBACK with no model call — the
         // launcher's chat ended in "I couldn't find any discussion about that".
         // The model now gets an explicit "nothing matched" excerpt and the
         // prompt's rule to note the gap and still answer from general knowledge.
+        // A plain question that no meeting covers is answered straight; the
+        // canned "That didn't come up in any of your meetings" line used to sit
+        // in the excerpts and opened most answers (2026-10-28).
         const formatted = context.chunks.length === 0
-            ? `(No matching excerpts were found across the user's meetings for this question.)\n${NO_GLOBAL_CONTEXT_FALLBACK}`
+            ? `(No matching excerpts were found across the user's meetings for this question.)`
             : context.formattedContext;
 
         // Build prompt with intent hint

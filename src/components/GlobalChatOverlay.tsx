@@ -132,9 +132,15 @@ type ChatState = 'idle' | 'waiting_for_llm' | 'streaming_response' | 'error';
 // within a bounded time instead of a silently frozen chat bubble.
 const RAG_QUERY_CLIENT_TIMEOUT_MS = 20000;
 
-function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+// The ceiling is on the FIRST token, not the whole answer (2026-10-28): the
+// invoke only resolves once the answer has finished streaming, so a long
+// answer that had been streaming for 20 s was wiped and replaced with "This is
+// taking longer than expected". Once a token has arrived the answer is alive,
+// and a stall after that is main's to end (RAGManager's stream stall guard).
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string, started: () => boolean = () => false): Promise<T> {
     return new Promise<T>((resolve, reject) => {
         const timer = setTimeout(() => {
+            if (started()) return;
             reject(new Error(`${label} timed out after ${ms}ms — the main process never responded`));
         }, ms);
         promise.then(
@@ -257,6 +263,8 @@ const GlobalChatOverlay: React.FC<GlobalChatOverlayProps> = ({
 
             // Set up RAG streaming listeners (RAF-batched)
             streamBuffer.reset();
+            // Set by either path's first token; see withTimeout.
+            let firstTokenSeen = false;
             // F-122: the rag:stream-* channels are SHARED by three scopes and
             // main tags every payload ({meetingId} | {live:true} | {global:true}),
             // but no consumer read the tag — so a meeting-scoped or live-scoped
@@ -267,6 +275,7 @@ const GlobalChatOverlay: React.FC<GlobalChatOverlayProps> = ({
             const isGlobal = (d: any) => d?.global === true;
             const tokenCleanup = window.electronAPI?.onRAGStreamChunk((data: { chunk: string }) => {
                 if (!isGlobal(data)) return;
+                firstTokenSeen = true;
                 setChatState('streaming_response');
                 streamBuffer.appendToken(data.chunk, (content) => {
                     setMessages(prev => prev.map(msg =>
@@ -321,7 +330,7 @@ const GlobalChatOverlay: React.FC<GlobalChatOverlayProps> = ({
             try {
                 const call = window.electronAPI?.ragQueryGlobal(question);
                 result = call
-                    ? await withTimeout(call, RAG_QUERY_CLIENT_TIMEOUT_MS, 'ragQueryGlobal')
+                    ? await withTimeout(call, RAG_QUERY_CLIENT_TIMEOUT_MS, 'ragQueryGlobal', () => firstTokenSeen)
                     : undefined;
             } catch (timeoutErr) {
                 console.error('[GlobalChat] ragQueryGlobal client-side timeout:', timeoutErr);
@@ -370,6 +379,7 @@ const GlobalChatOverlay: React.FC<GlobalChatOverlayProps> = ({
                 };
                 const oldTokenCleanup = window.electronAPI?.onGeminiStreamToken((token: string, meta?: { streamId?: number }) => {
                     if (!acceptsMeta(meta)) return;
+                    firstTokenSeen = true;
                     setChatState('streaming_response');
                     streamBuffer.appendToken(token, (content) => {
                         setMessages(prev => prev.map(msg =>
@@ -418,7 +428,7 @@ const GlobalChatOverlay: React.FC<GlobalChatOverlayProps> = ({
                 const fallbackCall = window.electronAPI?.streamGeminiChat(question, undefined, undefined, { skipSystemPrompt: false });
                 if (fallbackCall) {
                     try {
-                        await withTimeout(fallbackCall, RAG_QUERY_CLIENT_TIMEOUT_MS, 'streamGeminiChat');
+                        await withTimeout(fallbackCall, RAG_QUERY_CLIENT_TIMEOUT_MS, 'streamGeminiChat', () => firstTokenSeen);
                     } catch (timeoutErr) {
                         console.error('[GlobalChat] streamGeminiChat client-side timeout:', timeoutErr);
                         // Abandoning without cancelling left main streaming into
