@@ -155,7 +155,7 @@ if (process.platform === 'darwin') {
     valid = true;
   } catch { /* broken or missing signature */ }
   if (!valid || modified) {
-    const identity = (process.env.NATIVELY_LOCAL_SIGN_IDENTITY || '').trim() || '-';
+    const identity = require('./lib/local-sign-identity.cjs').resolveLocalSignIdentity(path.join(__dirname, '..')) || '-';
     try {
       execFileSync('codesign', ['--force', '--deep', '--sign', identity, appPath], { stdio: 'inherit' });
       console.log(`[patch-electron-plist] Re-signed Electron.app (${identity === '-' ? 'ad-hoc' : identity}).`);

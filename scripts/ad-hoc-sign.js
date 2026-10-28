@@ -314,7 +314,8 @@ exports.default = async function (context) {
     // names a stable local certificate (e.g. a self-signed "Natively Dev" code-signing
     // cert in the login keychain); the requirement is then that certificate, and
     // grants survive rebuilds. Same flow otherwise: not Developer ID, not notarized.
-    const localIdentity = (process.env.NATIVELY_LOCAL_SIGN_IDENTITY || '').trim();
+    // Read from the environment or .env (scripts/lib/local-sign-identity.cjs).
+    const localIdentity = require('./lib/local-sign-identity.cjs').resolveLocalSignIdentity(context.packager.info.projectDir);
     const signArg = localIdentity ? JSON.stringify(localIdentity) : '-';
     console.log(`[Ad-Hoc Signing] Signing main app ${appPath} with entitlements${localIdentity ? ` as "${localIdentity}"` : ''}...`);
 
