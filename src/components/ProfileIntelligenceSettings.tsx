@@ -2,29 +2,20 @@ import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import {
     X, RefreshCw, Upload, Briefcase, Trash2, Check, Globe,
     Building2, Search, AlertCircle, AlertTriangle, Gift, Info, Star,
-    User, CheckCircle, ArrowUpRight, ChevronRight, Paperclip, FileText,
+    User, Paperclip, FileText,
     GraduationCap, FolderKanban, Layers, Mail, MessageSquare, Target,
 } from 'lucide-react';
 import { ThinkingOrb } from 'thinking-orbs';
 import { useToggleInit } from './settings/useToggleInit';
 import { RoleInsightPanel } from '../premium';
 import { useResolvedTheme } from '../hooks/useResolvedTheme';
-import { LiquidGlassButton, useLensTracking } from '../ui-components/LiquidGlassButton';
+import { LiquidGlassButton } from '../ui-components/LiquidGlassButton';
 import { LiquidGlassBadge } from '../ui-components/LiquidGlassBadge';
 import { Presence } from './settings/SettingsRow';
 import { truncateResumeSummary } from '../utils/resumeSummary.mjs';
-import { CHECKOUT_URLS } from '../config/urls';
 import { useConfirmDialog } from './ui/ConfirmDialog';
 import { OwnAnswersSection } from './OwnAnswersSection';
 import { copyText } from '../lib/copyText';
-
-const openExternal = (url: string) => {
-    if ((window as any).electronAPI?.openExternal) {
-        (window as any).electronAPI.openExternal(url, { surface: 'profile_intelligence' });
-    } else {
-        window.open(url, '_blank', 'noopener,noreferrer');
-    }
-};
 
 // ─── CSS ──────────────────────────────────────────────────────────────────────
 const PI_CSS = `
@@ -1798,7 +1789,7 @@ const PI_GATE_CSS = `
     }
 `;
 
-function ProfileIntelligenceProGate({ onOpenNativelyAPI, onClose }: {
+function ProfileIntelligenceProGate({ onClose }: {
     onOpenNativelyAPI?: () => void;
     onClose?: () => void;
 }) {
@@ -1955,35 +1946,6 @@ function ProfileIntelligenceProGate({ onOpenNativelyAPI, onClose }: {
                 </div>
             </div>
 
-            {/* ── Footer ──────────────────────────────────────────────────────── */}
-            <div className="pig-foot" style={{
-                padding: '24px 32px',
-                borderTop: '1px solid var(--pig-border)',
-                display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center',
-                flexShrink: 0, background: 'var(--pig-bg)',
-            }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start' }}>
-                    {onOpenNativelyAPI && (
-                        <button className="pig-text-btn" onClick={onOpenNativelyAPI}>
-                            I have a license <ChevronRight size={12} />
-                        </button>
-                    )}
-                </div>
-
-                <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--pig-sub-low)', letterSpacing: '-0.01em', lineHeight: 1.4 }}>
-                    Currently your answers carry no personal context.<br/>
-                    <span style={{ color: '#fbbf24' }}>Unlock Pro to ground every answer in your identity, experience, and research.</span>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <button className="pig-cta-group" onClick={() => openExternal(CHECKOUT_URLS.apiMax)}>
-                        Unlock Pro
-                        <div className="pig-cta-icon-ring">
-                            <ArrowUpRight size={14} strokeWidth={2.5} />
-                        </div>
-                    </button>
-                </div>
-            </div>
         </div>
     );
 }
@@ -2018,9 +1980,6 @@ export function ProfileIntelligenceSettings({
     const [licenseLoaded, setLicenseLoaded] = useState(false);
     const hasProfileAccess = isPremium || isTrialActive;
     const theme = useResolvedTheme();
-    /* The CTA's Liquid Glass lens. Shared with LiquidGlassButton so the rAF
-       gate and the focus-clears-the-pointer rule have one implementation. */
-    const ctaLens = useLensTracking<HTMLButtonElement>();
 
     const [activeSection, setActiveSection] = useState('identity');
     // Which way the user just travelled through the nav. The incoming panel
@@ -3804,14 +3763,6 @@ export function ProfileIntelligenceSettings({
         coverletter: renderCoverLetter,
     };
 
-    // ── CTA class ─────────────────────────────────────────────────────────────
-    // The trial state renders LiquidGlassButton instead (see the CTA footer),
-    // so this pill is only ever Manage Pro or Unlock Pro.
-    const ctaClass = [
-        'pi-cta',
-        !isPremium ? 'pi-cta--shimmer' : '',
-    ].filter(Boolean).join(' ');
-
     // ── Non-pro users see the gate (wait for license verification) ────────────
     if (!hasProfileAccess) {
         // Busy, not empty: an empty card would read as settled to the genie.
@@ -3885,46 +3836,6 @@ export function ProfileIntelligenceSettings({
                     ))}
                 </div>
 
-                {/* CTA footer */}
-                <div style={{ padding: '12px', borderTop: '1px solid var(--pi-border)', flexShrink: 0 }}>
-                    {isTrialActive && !isPremium ? (
-                        /* During a free trial: the shared Liquid Glass button
-                           (src/ui-components), label only. Colour and size come
-                           from .pi-upgrade-lg in the style block above. */
-                        <LiquidGlassButton
-                            variant="action"
-                            className="lg-sm lg-wide pi-upgrade-lg"
-                            onClick={() => openPlans()}
-                        >
-                            Upgrade
-                        </LiquidGlassButton>
-                    ) : (
-                    <button
-                        ref={ctaLens.ref}
-                        onClick={() => openPlans()}
-                        onPointerMove={ctaLens.onPointerMove}
-                        onFocus={ctaLens.onFocus}
-                        className={ctaClass}
-                        style={{ width: '100%' }}
-                        aria-label={isPremium ? 'Manage Pro' : 'Unlock Pro'}
-                    >
-                        {/* Painted above the flat fill and the rim, below the
-                            content. Both pseudos are the material's already. */}
-                        <span className="pi-cta-lens" aria-hidden="true" />
-                        {!isPremium
-                            ? <span className="pi-cta-shimmer" aria-hidden="true" />
-                            : null}
-                        <span className="pi-cta-label">
-                            {isPremium ? 'Manage Pro' : 'Unlock Pro'}
-                        </span>
-                        <div className="pi-cta-ring">
-                            {isPremium
-                                ? <CheckCircle size={13} strokeWidth={2.5} />
-                                : <ArrowUpRight size={13} strokeWidth={2.5} />}
-                        </div>
-                    </button>
-                    )}
-                </div>
             </div>
 
             {/* ── Right panel ── */}

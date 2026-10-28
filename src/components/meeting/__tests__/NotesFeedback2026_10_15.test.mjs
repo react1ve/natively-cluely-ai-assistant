@@ -80,9 +80,10 @@ test('Compare: the version shown against the current notes, else the latest earl
 test('wiring: the picker goes through the same regenerate (and gate) as the suggestion', () => {
     const page = live(read('../../MeetingDetails.tsx'));
     assert.match(page, /<NotesTemplatePicker[\s\S]*?onPick=\{\(opt\) => \{[^}]*handleRegenerate\(\{ modeId: opt\.id \}\)/);
-    // A refusal from main marks that template and shows the way to the plans.
+    // A refusal from main marks that template. This build sells no plan, so the
+    // notice links nowhere (2026-10-28).
     assert.match(page, /res\?\.error === 'pro_required'[\s\S]{0,600}setTemplatesNeedingPro/);
-    assert.match(page, /openSettingsTab\?\.\('plans'\)/);
+    assert.doesNotMatch(page, /openSettingsTab\?\.\('plans'\)/);
     // The suggestion's refusal still reads as before.
     assert.match(page, /else setDetectedNeedsPro\(true\)/);
 });

@@ -3306,13 +3306,6 @@ ${meeting.detailedSummary.keyPoints?.map(item => `- ${item}`).join('\n') || 'Non
                                         {gatedTemplateName && (
                                             <p className="w-full flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-text-secondary">
                                                 <span>{`${gatedTemplateName} ${t('notes need Natively Pro')}`}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => { void window.electronAPI?.openSettingsTab?.('plans'); }}
-                                                    className="text-[12.5px] font-medium text-text-primary hover:underline"
-                                                >
-                                                    {t('See plans')}
-                                                </button>
                                             </p>
                                         )}
                                         {v3SummaryStatus && v3SummaryStatus !== 'completed' && (
