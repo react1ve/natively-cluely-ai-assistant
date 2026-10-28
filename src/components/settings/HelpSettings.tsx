@@ -22,7 +22,7 @@ import {
     HelpClip, HelpCommand, HelpDefinitions, HelpFigure, HelpGuideRow, HelpKeys, HelpLegend, HelpLink,
     HelpPath, HelpSteps, HelpSubhead, helpFill,
 } from './help/HelpParts';
-import { AnswerFlowFigure, NativelyGlyph, OverlayAnatomyFigure, PermissionsFigure } from './help/HelpGraphics';
+import { AnswerFlowFigure, OverlayAnatomyFigure, PermissionsFigure } from './help/HelpGraphics';
 import { HELP_CLIPS, PERMISSIONS_CARD, type HelpClipEntry } from './help/helpClips';
 import {
     getPermissions, getPlatformFacts, getRowCopy, isHelpPlatform,
@@ -336,18 +336,6 @@ const HelpPane: React.FC<{
                 </div>
                 <SettingsMotionReady.Provider value={setupReady}>
                 <div className={ROW_GROUP}>
-                    <SettingsRow
-                        icon={<NativelyGlyph size={20} />}
-                        title={t('Natively API')}
-                        badge={
-                            <Presence kind="badge" id={status.natively.state === 'todo' ? 'quickest' : null}>
-                                <LiquidGlassBadge variant="neutral">{t('Quickest')}</LiquidGlassBadge>
-                            </Presence>
-                        }
-                        description={tDetail(status.natively.detail)}
-                        descriptionKey={status.natively.state}
-                        control={onNavigate && <GoButton label={t('Plans & Billing')} onClick={go('plans')} />}
-                    />
                     <SettingsRow
                         icon={<ShieldCheck size={20} />}
                         title={t('Allow permissions')}

@@ -449,6 +449,12 @@ const ProviderSelect: React.FC<ProviderSelectProps> = ({ value, options, onChang
    from above, so the motion stays spatially consistent with the nav. Any id not
    in this list (deep-links from HelpSettings) falls back to the downward
    direction rather than guessing. Keep in sync with the <nav> below. */
+// This build sells no plan: the Plans & Billing panel ('plans' and its legacy
+// ids) is never shown. Any request for it, a deep link from a card or a
+// Settings link, lands on AI Providers, where keys are set up (2026-10-28).
+const PLAN_TABS = new Set(['plans', 'natively-api', 'natively-pro']);
+const resolveSettingsTab = (tab: string) => (PLAN_TABS.has(tab) ? 'ai-providers' : tab);
+
 const SETTINGS_NAV_ORDER = [
     'general',
     'plans',
@@ -544,7 +550,8 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
     const resolvedTheme = useResolvedTheme();
     const isLight = resolvedTheme === 'light';
     const { t, lang, setLang } = useLanguage();
-    const [activeTab, setActiveTab] = useState(initialTab);
+    const [activeTab, setActiveTabState] = useState(() => resolveSettingsTab(initialTab));
+    const setActiveTab = (tab: string) => setActiveTabState(resolveSettingsTab(tab));
     // In-window confirms only: see ConfirmDialog.tsx for why never confirm().
     const { confirm: askConfirm, dialog: confirmDialog } = useConfirmDialog();
 
@@ -652,8 +659,9 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
                to stop. Suppress that one transition. The `!==` matters: setting
                this on a same-tab open would never clear and would swallow the
                user's first real tab click. */
-            if (initialTab !== activeTab) suppressPanelAnimRef.current = true;
-            setActiveTab(initialTab);
+            const target = resolveSettingsTab(initialTab);
+            if (target !== activeTab) suppressPanelAnimRef.current = true;
+            setActiveTab(target);
             setRetrievalRequest({
                 tab: initialTab === 'reranker' ? 'reranker'
                     : initialTab === 'embedding' ? 'embedding'
