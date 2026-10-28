@@ -53,6 +53,7 @@ import { useResolvedTheme } from "./hooks/useResolvedTheme"
 import { useDiagramRenderHost } from "./lib/diagram/diagramRuntime"
 import { WelcomeFlow } from "./components/onboarding/WelcomeFlow"
 import { shouldShowWelcome, hasOnboardingHistory, WELCOME_SEEN_KEY, LEGACY_PERMS_SHOWN_KEY, ONBOARDING_STATE_KEY } from "./lib/onboarding/welcomeGate.mjs"
+import { withoutSalesCards } from "./lib/onboarding/salesCards.mjs"
 
 // How often the launcher may re-read the card inputs when it regains focus
 // (main caches /usage for 60 s; toaster policy §6 row 18).
@@ -624,7 +625,7 @@ const App: React.FC = () => {
     import('./lib/onboarding/stageCatalog.ts').then(({ STAGES, QUIET_WINDOW_STAGE }) => {
       if (cancelled) return;
       const orch = getOrchestrator();
-      orch.start([...STAGES, QUIET_WINDOW_STAGE]);
+      orch.start(withoutSalesCards([...STAGES, QUIET_WINDOW_STAGE]));
       stopFn = () => orch.stop();
       // DEV-only card overrides (?forceCard, ?forceAd, ?review=force,
       // ?extToaster=force): the card goes through the orchestrator, takes the

@@ -2,7 +2,11 @@
 // whichever button asked. The Home card used to record that answer itself; with
 // the card gone, main does, so the manual start the overlay offers after a
 // failed automatic one leaves the same trace as the automatic one would have.
-import { test, before } from 'node:test';
+import { test as nodeTest, before } from 'node:test';
+import { AUTO_TRIAL_ENABLED } from '../../../src/lib/trial/autoTrial.mjs';
+
+// The automatic start is off in this build (src/lib/trial/autoTrial.mjs).
+const test = AUTO_TRIAL_ENABLED ? nodeTest : nodeTest.skip;
 import assert from 'node:assert/strict';
 import { loadIpcHandlers } from './autoTrialHarness.mjs';
 

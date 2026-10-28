@@ -12,7 +12,7 @@ import { resolveMacScreenStatus } from '../src/lib/permissionAttentionPolicy.mjs
 import { hasOwnAiKey, resolveExpiredTrial } from '../src/lib/trialPolicy.mjs';
 import { CARDS, OUTCOMES } from '../src/lib/cards/cardPolicy.mjs';
 import { TRIAL_CAMPAIGN, TRIAL_PROMO_ID, runTrialCampaignReset } from '../src/lib/trialCampaign.mjs';
-import { autoTrialFollowUp, runAutoTrial, shouldAutoStartTrial } from '../src/lib/trial/autoTrial.mjs';
+import { AUTO_TRIAL_ENABLED, autoTrialFollowUp, runAutoTrial, shouldAutoStartTrial } from '../src/lib/trial/autoTrial.mjs';
 import { stripGistTrailer } from '../src/lib/displayMarkup';
 import { CardLedger } from './services/cards/CardLedger';
 import { funnelTelemetry } from './services/FunnelTelemetry';
@@ -12661,6 +12661,7 @@ export function initializeIpcHandlers(appState: AppState): void {
   // does not ask again for a while. In memory only: a new launch may ask.
   let autoTrialQuietUntil = 0;
   const autoStartTrialForMeeting = async (): Promise<void> => {
+    if (!AUTO_TRIAL_ENABLED) return;
     if (autoTrialInFlight) return;
     autoTrialInFlight = true;
     const tell = (data: { state: 'pending' | 'settled' } | { state: 'failed'; reason: 'unreachable' | 'rate_limited' }) => {

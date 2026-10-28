@@ -10,6 +10,12 @@
 
 import { classifyTrialStart, startTrialWithRetry } from './trialStart.mjs';
 
+// This build never starts the trial by itself (2026-10-28). The trial is the
+// way into a paid plan, and every surface it raises sells one: the Home
+// meter's "See plans", the overlay's banners and the "trial ended" card. With
+// no automatic start none of them appear. The rule below is kept as it is.
+export const AUTO_TRIAL_ENABLED = false;
+
 /**
  * Should this meeting start a trial?
  *

@@ -3,6 +3,8 @@ import type { TrialStartReply } from './trialStart.mjs';
 export type AutoTrialOutcome = 'started' | 'unavailable' | 'unsupported' | 'network_limited' | 'rate_limited' | 'failed';
 export type AutoTrialFailure = 'unreachable' | 'rate_limited';
 
+export declare const AUTO_TRIAL_ENABLED: boolean;
+
 export function shouldAutoStartTrial(s: {
   meetingAi?: 'natively' | 'own' | 'none';
   hasRealNativelyKey?: boolean;

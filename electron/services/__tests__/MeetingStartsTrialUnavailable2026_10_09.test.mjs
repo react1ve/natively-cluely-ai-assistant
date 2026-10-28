@@ -5,7 +5,11 @@
 //
 // A separate file from MeetingStartsTrial because "claimed" is permanent, and
 // the compiled module's credentials live for the whole process.
-import { test, before } from 'node:test';
+import { test as nodeTest, before } from 'node:test';
+import { AUTO_TRIAL_ENABLED } from '../../../src/lib/trial/autoTrial.mjs';
+
+// The automatic start is off in this build (src/lib/trial/autoTrial.mjs).
+const test = AUTO_TRIAL_ENABLED ? nodeTest : nodeTest.skip;
 import assert from 'node:assert/strict';
 import { loadIpcHandlers } from './autoTrialHarness.mjs';
 
