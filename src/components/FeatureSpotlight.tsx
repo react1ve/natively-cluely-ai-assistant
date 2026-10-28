@@ -2,11 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Bell, Rocket } from 'lucide-react';
 import mainui from "../UI_comp/mainui.png";
-import sidruneLogo from '../assets/sponsors/sidrune-logo-white.svg';
 import {
-    AFFILIATE_PROGRAM_URL,
-    CREATORS_PROGRAM_URL,
-    FLUXION_REFERRAL_URL,
     SPONSORSHIP_EMAIL,
     SPONSORSHIP_GMAIL_COMPOSE_URL,
 } from '../lib/partnerLinks';
@@ -30,53 +26,8 @@ interface FeatureSlide {
 // --- Data ---
 
 const FEATURES: FeatureSlide[] = [
-    {
-        // Fluxion AI renamed itself Sidrune AI (Oct 2026). The sign-up link is
-        // unchanged on purpose: the sponsor asked to keep it and its parameters.
-        id: 'sponsor_sidrune',
-        headline: 'Sidrune AI',
-        logo: sidruneLogo,
-        subtitle: 'One API for GPT, Claude, and other leading AI models',
-        bullets: ['Get $3 in API credit through Natively'],
-        type: 'sponsor',
-        actionLabel: 'Claim $3 credit',
-        url: FLUXION_REFERRAL_URL,
-    },
-    {
-        id: 'tailored_answers',
-        headline: 'Upcoming features',
-        subtitle: 'Answers, tailored to you',
-        bullets: ['Repo aware explanations', 'System design interview specialization'],
-        footer: 'Designed to work silently during live interviews.',
-        type: 'premium',
-    },
-    // The two programs on heynatively.com. Copy stays inside what those pages
-    // promise: the affiliate page shows no rate, so neither does this card.
-    {
-        id: 'program_creators',
-        headline: 'Post about Natively',
-        subtitle: 'Get a month of Ultra, free',
-        bullets: [
-            'A public post in your own words',
-            'Yours once it reaches 5,000 views',
-        ],
-        type: 'program',
-        actionLabel: 'See how it works',
-        url: CREATORS_PROGRAM_URL,
-    },
-    {
-        id: 'program_affiliate',
-        headline: 'Earn with Natively',
-        subtitle: 'Share what you use, earn when they buy',
-        bullets: [
-            'A commission on every sale you refer',
-            'Each click counts for 30 days',
-        ],
-        type: 'program',
-        actionLabel: 'Join the affiliate program',
-        url: AFFILIATE_PROGRAM_URL,
-    },
-
+    // Sponsor, premium and paid-plan program slides removed (2026-10-28): this
+    // build sells no plan and shows no sponsor ads.
     {
         id: 'support_natively',
         headline: 'Support development',
