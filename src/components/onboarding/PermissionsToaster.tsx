@@ -30,6 +30,7 @@ import { GenieModal } from '../ui/GenieModal';
 import { describePermRow, allPermissionsResolved, statusPollIntervalMs } from '../../lib/permissionRowPolicy.mjs';
 import type { RowPresentation } from '../../lib/permissionRowPolicy.mjs';
 import { windowsMicPage } from '../../lib/micPermissionPolicy.mjs';
+import { useT } from '../../i18n';
 
 const STORAGE_KEY = 'natively_perms_shown_v1';
 
@@ -121,6 +122,7 @@ const SPRING = {
 };
 
 export const PermissionsToaster: React.FC<Props> = ({ isOpen, onDismiss }) => {
+  const t = useT();
   const [ready,      setReady]      = useState(false);
   // The preload knows the platform before the first status read comes back, so
   // a failed read can no longer leave a Windows card drawn as the macOS one.
@@ -419,7 +421,7 @@ export const PermissionsToaster: React.FC<Props> = ({ isOpen, onDismiss }) => {
       {/* The close sits on the inset panel (below), as it does on the
           extension card. Without a panel it falls back to the card corner. */}
       {!hasGuide && (
-      <button onClick={handleDismiss} aria-label="Dismiss"
+      <button onClick={handleDismiss} aria-label={t('Dismiss')}
         style={{
           position: 'absolute', top: '16px', right: '16px', zIndex: 10,
           background: 'none', border: 'none', cursor: 'pointer',
@@ -457,7 +459,7 @@ export const PermissionsToaster: React.FC<Props> = ({ isOpen, onDismiss }) => {
           {/* Header row */}
           <div style={{ marginBottom: '24px' }}>
             <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: t3 }}>
-              Permissions
+              {t('Permissions')}
             </span>
           </div>
 
@@ -472,14 +474,14 @@ export const PermissionsToaster: React.FC<Props> = ({ isOpen, onDismiss }) => {
                 style={{ marginBottom: '24px' }}
               >
                 <h2 id="perm-toast-title" style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.03em', color: t1, margin: '0 0 8px', lineHeight: 1.2 }}>
-                  Let's get you set up
+                  {t("Let's get you set up")}
                 </h2>
                 <p id="perm-toast-desc" style={{ fontSize: '13px', lineHeight: 1.65, color: t3, margin: 0 }}>
-                  {isMac
+                  {t(isMac
                     ? 'Natively needs a few permissions to capture meetings and transcribe speech.'
                     : isWin
                     ? 'Screen recording is already allowed. Natively only needs your microphone.'
-                    : 'Natively needs microphone access to transcribe speech.'}
+                    : 'Natively needs microphone access to transcribe speech.')}
                 </p>
               </motion.div>
 
@@ -538,7 +540,7 @@ export const PermissionsToaster: React.FC<Props> = ({ isOpen, onDismiss }) => {
                 backgroundSize: '24px 24px',
               }} />
 
-              <button onClick={handleDismiss} aria-label="Dismiss"
+              <button onClick={handleDismiss} aria-label={t('Dismiss')}
                 style={{
                   position: 'absolute', top: '8px', right: '8px', zIndex: 2,
                   width: '30px', height: '30px',
@@ -633,6 +635,7 @@ function PrimaryButton({
   disabled?: boolean;
   variant?: 'blue' | 'green';
 }) {
+  const t = useT();
   const glass = variant === 'blue';
   return (
     <LiquidGlassButton
@@ -667,7 +670,7 @@ function PrimaryButton({
         cursor: disabled ? 'default' : 'pointer',
       } as React.CSSProperties}
     >
-      {label}
+      {t(label)}
     </LiquidGlassButton>
   );
 }
@@ -682,6 +685,7 @@ function AllSetPanel({ isLight, reduced, enter, onContinue, rows }: {
   isLight: boolean; reduced: boolean; enter: boolean; onContinue: () => void;
   rows: React.ReactNode;
 }) {
+  const t = useT();
   const t1 = isLight ? '#1C1C1E' : '#FFFFFF';
   const t3 = isLight ? 'rgba(28, 28, 30, 0.48)' : 'rgba(255, 255, 255, 0.44)';
 
@@ -693,10 +697,10 @@ function AllSetPanel({ isLight, reduced, enter, onContinue, rows }: {
       style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
     >
       <h2 id="perm-toast-title" style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.03em', color: t1, margin: '0 0 8px', lineHeight: 1.2 }}>
-        You're all set
+        {t("You're all set")}
       </h2>
       <p id="perm-toast-desc" style={{ fontSize: '13px', lineHeight: 1.65, color: t3, margin: '0 0 24px' }}>
-        Natively has everything it needs.
+        {t('Natively has everything it needs.')}
       </p>
 
       {rows}
@@ -722,6 +726,7 @@ function GuideSteps({ isLight, colors, t3, reduced, enter }: {
   reduced: boolean;
   enter: boolean;
 }) {
+  const t = useT();
   const rise = (delay: number) => (!enter
     ? { initial: false as const }
     : reduced
@@ -763,7 +768,7 @@ function GuideSteps({ isLight, colors, t3, reduced, enter }: {
           fontSize: '10.5px', fontWeight: 600, color: colors.mockTextPrimary,
           lineHeight: 1.25, letterSpacing: '-0.005em', marginBottom: '9px',
         }}>
-          Natively wants to record the screen.
+          {t('Natively wants to record the screen.')}
         </div>
 
         <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
@@ -813,7 +818,7 @@ function GuideSteps({ isLight, colors, t3, reduced, enter }: {
       </motion.div>
 
       <p style={{ fontSize: '10px', fontWeight: 500, color: t3, lineHeight: 1.4, margin: '6px 0 0', textAlign: 'center', opacity: 0.85, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-        System Settings → Privacy &amp; Security
+        <Tr>System Settings → Privacy &amp; Security</Tr>
       </p>
     </div>
   );
@@ -841,13 +846,22 @@ function GuideSteps({ isLight, colors, t3, reduced, enter }: {
 // name on that release is the row's tooltip. Desktop apps are allowed as a
 // group, so there is no "Natively" row to picture.
 // Still images with an entrance only, as on macOS.
-function GuideStepsWindows({ colors, t3, reduced, enter, page }: {
+function GuideStepsWindows({ colors, t3, reduced, enter, page: shown }: {
   colors: CardColors;
   t3: string;
   reduced: boolean;
   enter: boolean;
   page: ReturnType<typeof windowsMicPage>;
 }) {
+  // The page's names in the app's language. path[0] ("Settings") is left as
+  // it is: the caption below translates it together with "Windows".
+  const t = useT();
+  const page = {
+    ...shown,
+    path: shown.path.map((p, i) => (i === 0 ? p : t(p))),
+    switches: shown.switches.map(s => t(s)),
+    label: t(shown.label),
+  };
   const rise = (delay: number) => (!enter
     ? { initial: false as const }
     : reduced
@@ -882,7 +896,7 @@ function GuideStepsWindows({ colors, t3, reduced, enter, page }: {
           fontSize: '10.5px', fontWeight: 600, color: colors.mockTextPrimary,
           lineHeight: 1.25, letterSpacing: '-0.005em', marginBottom: '8px',
         }}>
-          Natively needs your microphone.
+          {t('Natively needs your microphone.')}
         </div>
 
         <div style={{
@@ -944,7 +958,7 @@ function GuideStepsWindows({ colors, t3, reduced, enter, page }: {
       </motion.div>
 
       <p style={{ fontSize: '10px', fontWeight: 500, color: t3, lineHeight: 1.4, margin: '6px 0 0', textAlign: 'center', opacity: 0.85, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-        Windows {page.path[0]}
+        <Tr>Windows {page.path[0]}</Tr>
       </p>
     </div>
   );
@@ -966,6 +980,7 @@ function MockGlassButton({ isLight, primary, color, children }: {
   color?: string;
   children: React.ReactNode;
 }) {
+  const t = useT();
   return (
     <span
       className={`lg-button ${primary ? 'lg-lavender' : 'lg-clear'} lg-sm lg-wide`}
@@ -1001,7 +1016,7 @@ function MockGlassButton({ isLight, primary, color, children }: {
       } as React.CSSProperties}
     >
       <span className="lg-content">
-        <span className="lg-label">{children}</span>
+        <span className="lg-label">{typeof children === 'string' ? t(children) : children}</span>
       </span>
     </span>
   );
@@ -1013,6 +1028,7 @@ function GuideResolved({ isLight, colors, t3 }: {
   colors: CardColors;
   t3: string;
 }) {
+  const t = useT();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', position: 'relative', zIndex: 1 }}>
       <div style={{
@@ -1025,7 +1041,7 @@ function GuideResolved({ isLight, colors, t3 }: {
         <Check size={26} strokeWidth={2.5} color={T.green} />
       </div>
       <p style={{ fontSize: '10px', fontWeight: 500, color: t3, lineHeight: 1.4, margin: 0, textAlign: 'center', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-        Ready to go
+        {t('Ready to go')}
       </p>
     </div>
   );
@@ -1046,6 +1062,7 @@ function PermItem({
   reduced:  boolean;
   isLight:  boolean;
 }) {
+  const t = useT();
   const t1 = isLight ? '#1C1C1E' : '#FFFFFF';
   const t3 = isLight ? 'rgba(28, 28, 30, 0.48)' : 'rgba(255, 255, 255, 0.44)';
   // On light the row was 245,245,245 on a 253,253,254 card — eight levels of
@@ -1088,9 +1105,9 @@ function PermItem({
 
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: '13px', fontWeight: 580, color: t1, letterSpacing: '-0.015em', whiteSpace: 'nowrap' }}>{label}</div>
+        <div style={{ fontSize: '13px', fontWeight: 580, color: t1, letterSpacing: '-0.015em', whiteSpace: 'nowrap' }}>{t(label)}</div>
         <div style={{ fontSize: '11px', color: t3, marginTop: '2px', lineHeight: 1.3 }}>
-          {row.sublabel}
+          {t(row.sublabel)}
         </div>
       </div>
 
@@ -1105,17 +1122,27 @@ function PermItem({
             <Loader2 size={17} strokeWidth={2} color={T.blue} />
           </motion.div>
         ) : row.tone === 'granted' ? (
-          <Check aria-label="Access granted" size={16} strokeWidth={2.75} color={T.green} />
+          <Check aria-label={t('Access granted')} size={16} strokeWidth={2.75} color={T.green} />
         ) : row.tone === 'blocked' ? (
           <Lock size={15} strokeWidth={2} color={T.amber} />
         ) : row.tone === 'pending' ? null : (
           // Not granted yet. A hollow circle against the granted row's filled
           // check reads as "outstanding" at a glance, without dressing a
           // status up as a button the way the blue action pill did.
-          <Circle aria-label="Not granted" size={15} strokeWidth={1.75}
+          <Circle aria-label={t('Not granted')} size={15} strokeWidth={1.75}
             color={isLight ? 'rgba(28,28,30,0.28)' : 'rgba(255,255,255,0.3)'} />
         )}
       </div>
     </motion.div>
   );
+}
+
+// ─── Translated text children ─────────────────────────────────
+// Translates the plain text it wraps, joined into one string, so copy that
+// mixes an entity or a value (`Privacy &amp; Security`, `Windows {page.path[0]}`)
+// is still looked up by its whole English sentence.
+function Tr({ children }: { children: React.ReactNode }) {
+  const t = useT();
+  const text = React.Children.toArray(children).join('');
+  return <>{t(text)}</>;
 }

@@ -14,6 +14,7 @@ import { X, Monitor, Mic, Lightbulb, Check, AlertCircle, ArrowRight, Lock } from
 import { NativelyLogoMark } from '../NativelyLogoMark';
 import nativelyIcon from '../../../assets/icon.png';
 import { classifyMicStatus } from '../../lib/micPermissionPolicy.mjs';
+import { useT } from '../../i18n';
 
 const STORAGE_KEY  = 'natively_perms_shown_v1';
 
@@ -107,6 +108,7 @@ function PermRow({
   onToggle:    () => void;
   hasBadge?:   boolean;
 }) {
+  const t = useT();
   return (
     <motion.div
       variants={itemVariants}
@@ -172,7 +174,7 @@ function PermRow({
           letterSpacing: '-0.01em',
           fontFamily: "'Inter', sans-serif"
         }}>
-          {label}
+          {t(label)}
         </div>
         <div style={{
           fontSize: '12.5px',
@@ -181,7 +183,7 @@ function PermRow({
           fontFamily: "'Inter', sans-serif",
           lineHeight: 1.4,
         }}>
-          {description}
+          {t(description)}
         </div>
       </div>
 
@@ -195,6 +197,7 @@ function PermRow({
 
 // ─── Main PermissionsOnboardingFull Component ───────────────────
 export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }) => {
+  const t = useT();
   const [platform,   setPlatform]   = useState<string>('darwin');
   const [micStatus,  setMicStatus]  = useState<PermStatus>('loading');
   const [scrStatus,  setScrStatus]  = useState<PermStatus>('loading');
@@ -373,7 +376,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
             <motion.div variants={itemVariants} style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
               <button 
                 onClick={handleDismiss} 
-                aria-label="Skip for now"
+                aria-label={t('Skip for now')}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -389,7 +392,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                 onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.backgroundColor = '#F4F5F7'; }}
                 onMouseLeave={e => { e.currentTarget.style.opacity = '0.6'; e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
-                Skip for now
+                {t('Skip for now')}
               </button>
             </motion.div>
 
@@ -407,7 +410,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                   fontFamily: "'Inter', sans-serif",
                 }}
               >
-                Let's get you set up
+                {t("Let's get you set up")}
               </motion.h2>
               <motion.p
                 variants={itemVariants}
@@ -419,7 +422,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                   fontFamily: "'Inter', sans-serif",
                 }}
               >
-                Allow Natively the following system accesses to enable premium recording, real-time assist tools, and seamless audio transcriptions.
+                {t('Allow Natively the following system accesses to enable premium recording, real-time assist tools, and seamless audio transcriptions.')}
               </motion.p>
 
               {/* High-Fidelity Permission list items */}
@@ -503,7 +506,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                   <span className="absolute top-1 left-2 right-2 h-[40%] rounded-full bg-gradient-to-b from-white/70 to-white/5 blur-[0.5px] pointer-events-none z-10" />
                 )}
 
-                <span style={{ position: 'relative', zIndex: 20 }}>{btnConfig.label}</span>
+                <span style={{ position: 'relative', zIndex: 20 }}>{t(btnConfig.label)}</span>
                 <ArrowRight size={18} strokeWidth={2.5} color={btnConfig.active ? '#FFFFFF' : '#9CA3AF'} style={{ position: 'relative', zIndex: 20 }} />
               </motion.button>
               
@@ -575,7 +578,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                 }}>
                   <img
                     src={nativelyIcon}
-                    alt="Natively Icon"
+                    alt={t('Natively Icon')}
                     style={{
                       width: '42px',
                       height: '42px',
@@ -610,7 +613,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                     lineHeight: 1.35,
                     fontFamily: "'Inter', sans-serif",
                   }}>
-                    "Natively" would like to record this computer's screen and audio.
+                    {t('"Natively" would like to record this computer\'s screen and audio.')}
                   </div>
                   <div style={{
                     fontSize: '10px',
@@ -618,7 +621,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                     lineHeight: 1.4,
                     fontFamily: "'Inter', sans-serif",
                   }}>
-                    Grant access to this application in Privacy & Security settings, located in System Settings.
+                    {t('Grant access to this application in Privacy & Security settings, located in System Settings.')}
                   </div>
                 </div>
               </div>
@@ -642,7 +645,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                   onMouseEnter={e => e.currentTarget.style.backgroundColor = '#E5E7EB'}
                   onMouseLeave={e => e.currentTarget.style.backgroundColor = '#F3F4F6'}
                 >
-                  Open System Settings
+                  {t('Open System Settings')}
                 </button>
                 <button
                   onClick={handleDismiss}
@@ -661,7 +664,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                   onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
                   onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                 >
-                  Deny
+                  {t('Deny')}
                 </button>
               </div>
             </div>
@@ -687,10 +690,10 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
               {/* Settings Header */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '14px' }}>
                 <div style={{ fontSize: '12px', fontWeight: 700, color: COLORS.charcoalInk }}>
-                  Screen & System Audio Recording
+                  {t('Screen & System Audio Recording')}
                 </div>
                 <div style={{ fontSize: '9.5px', color: COLORS.mutedSteel, lineHeight: 1.3 }}>
-                  Allow the applications below to record the content of your screen and audio, even while using other applications.
+                  {t('Allow the applications below to record the content of your screen and audio, even while using other applications.')}
                 </div>
               </div>
 

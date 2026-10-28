@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SETTINGS_RU } from '../../i18n.settings.ru.ts';
+import { PERMISSIONS_RU } from '../../i18n.permissions.ru.ts';
 import { RU_GENERATED } from '../../i18n.ru.generated.ts';
 import { RU_GENERATED2 } from '../../i18n.ru.generated2.ts';
 import { ONBOARDING_RU } from '../../i18n.onboarding.ts';
@@ -48,11 +49,18 @@ const RU_KEYS = new Set([
   ...Object.keys(ASSIST_RU),
   ...Object.keys(AMBIENT_CHAT_RU),
   ...Object.keys(SETTINGS_RU),
+  ...Object.keys(PERMISSIONS_RU),
   ...handRows(),
 ]);
 
 function settingsFiles() {
-  const out = ['src/components/SettingsOverlay.tsx'];
+  // Settings, and the permissions card and onboarding (translated 2026-10-28 too).
+  const out = [
+    'src/components/SettingsOverlay.tsx',
+    'src/components/onboarding/PermissionsToaster.tsx',
+    'src/components/onboarding/PermissionsOnboardingFull.tsx',
+    'src/components/onboarding/BrowserExtensionToaster.tsx',
+  ];
   const walk = (dir) => {
     for (const e of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
       const rel = path.join(dir, e.name);
@@ -77,7 +85,7 @@ test('every t() literal in Settings has a Russian row', () => {
 
 test('a Russian row keeps the slots of its English sentence', () => {
   const slots = (s) => (s.match(/\{\{?\w+\}?\}/g) || []).sort();
-  for (const [en, ru] of Object.entries(SETTINGS_RU)) {
+  for (const [en, ru] of Object.entries({ ...SETTINGS_RU, ...PERMISSIONS_RU })) {
     assert.ok(ru.trim().length > 0, `"${en}" is empty`);
     assert.deepEqual(slots(ru), slots(en), `"${en}"`);
   }
@@ -87,4 +95,6 @@ test('the RU dictionary spreads the Settings rows', () => {
   const src = read('src/i18n.tsx');
   assert.match(src, /import \{ SETTINGS_RU \} from '\.\/i18n\.settings\.ru';/);
   assert.match(src, /\.\.\.SETTINGS_RU,/);
+  assert.match(src, /import \{ PERMISSIONS_RU \} from '\.\/i18n\.permissions\.ru';/);
+  assert.match(src, /\.\.\.PERMISSIONS_RU,/);
 });
