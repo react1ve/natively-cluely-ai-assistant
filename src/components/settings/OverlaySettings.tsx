@@ -485,22 +485,18 @@ const NOTEPAD_SAMPLE: NotesWindowPreview = {
 const NOTEPAD_PREVIEW = { width: 460, height: 780, scale: 0.6 } as const;
 
 /** The notepad as it opens: the real page, on its own window frame. */
-const NotepadPreview: React.FC = () => {
-    const t = useT();
-    const sample: NotesWindowPreview = { ...NOTEPAD_SAMPLE, title: t(NOTEPAD_SAMPLE.title), text: t(NOTEPAD_SAMPLE.text) };
-    return (
+const NotepadPreview: React.FC = () => (
     <div className="natively-key-card rounded-xl border border-border-subtle bg-bg-item-surface py-6 flex justify-center overflow-hidden">
         <div style={{ width: NOTEPAD_PREVIEW.width * NOTEPAD_PREVIEW.scale, height: NOTEPAD_PREVIEW.height * NOTEPAD_PREVIEW.scale }} className="shrink-0">
             <div
                 style={{ width: NOTEPAD_PREVIEW.width, height: NOTEPAD_PREVIEW.height, transform: `scale(${NOTEPAD_PREVIEW.scale})`, transformOrigin: 'top left' }}
                 className="rounded-[16px] overflow-hidden border border-border-subtle shadow-xl"
             >
-                <NotesWindow preview={sample} />
+                <NotesWindow preview={NOTEPAD_SAMPLE} />
             </div>
         </div>
     </div>
-    );
-};
+);
 
 export const OverlaySettings: React.FC<{
     opacity: number;
