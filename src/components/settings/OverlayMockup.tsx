@@ -20,6 +20,7 @@ import icon from '../icon.png';
 import TopPill from '../ui/TopPill';
 // The Lavender style's pills are the website hero's button classes.
 import '../overlay/heroGlass/HeroGlassButton.css';
+import { BRAND_NAME } from '../../lib/brand.mjs';
 
 /** One overlay button as the overlay draws it (its classes, glyph and label). */
 export const overlayChipClass = (id: OverlayButtonId, theme?: MeetingInterfaceTheme) =>
@@ -93,7 +94,7 @@ export const OverlayMockup: React.FC<{
                     <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden">
                         <img
                             src={icon}
-                            alt="Natively"
+                            alt={BRAND_NAME}
                             className="top-pill-logo w-8 h-8 object-contain opacity-95 force-black-icon"
                             draggable="false"
                         />

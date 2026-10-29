@@ -3,6 +3,7 @@ import { ArrowLeft, Check, Lock, Search, X } from 'lucide-react';
 import { NOTE_TEMPLATES, NOTE_TEMPLATE_GROUPS, searchNoteTemplates, type NoteTemplate } from '../../../electron/services/meeting/noteTemplates';
 import nativelyMark from '../../assets/logo.webp';
 import { noteTemplateGlyph } from './noteTemplateIcons';
+import { BRAND_NAME } from '../../lib/brand.mjs';
 
 /**
  * "Note templates" (2026-10-20), Granola's gallery: the templates grouped on
@@ -148,7 +149,7 @@ export const NoteTemplateGallery: React.FC<{
                 <span aria-hidden className="w-6 h-6 shrink-0 rounded-full flex items-center justify-center" style={{ background: '#1e1e1e' }}>
                     <img src={nativelyMark} alt="" draggable={false} className="w-4 h-4" />
                 </span>
-                <span className="ml-[7px]" style={ink('--np-ink-strong')}>Natively</span>
+                <span className="ml-[7px]" style={ink('--np-ink-strong')}>{BRAND_NAME}</span>
                 <Lock className="ml-[19px] w-3 h-3 shrink-0" strokeWidth={2.25} style={ink('--np-label')} aria-hidden />
                 <span className="ml-[7px]" style={ink('--np-label')}>View only</span>
             </div>

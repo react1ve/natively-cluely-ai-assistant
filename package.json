@@ -322,13 +322,13 @@
       "hardenedRuntime": false,
       "artifactName": "Natively-${version}-${arch}.${ext}",
       "extendInfo": {
-        "CFBundleDisplayName": "Natively",
-        "NSScreenCaptureUsageDescription": "Natively needs Screen Recording permission to capture system audio for meeting transcription.",
-        "NSMicrophoneUsageDescription": "Natively needs microphone access to transcribe your voice during meetings.",
-        "NSAudioCaptureUsageDescription": "Natively needs system audio access to transcribe meeting audio.",
-        "NSSpeechRecognitionUsageDescription": "Natively uses Apple Speech to transcribe meeting audio on your device.",
-        "NSCalendarsFullAccessUsageDescription": "Natively uses your calendar to name your meetings and show who is in them. It never changes your events.",
-        "NSCalendarsUsageDescription": "Natively uses your calendar to name your meetings and show who is in them. It never changes your events."
+        "CFBundleDisplayName": "Clevi",
+        "NSScreenCaptureUsageDescription": "Clevi needs Screen Recording permission to capture system audio for meeting transcription.",
+        "NSMicrophoneUsageDescription": "Clevi needs microphone access to transcribe your voice during meetings.",
+        "NSAudioCaptureUsageDescription": "Clevi needs system audio access to transcribe meeting audio.",
+        "NSSpeechRecognitionUsageDescription": "Clevi uses Apple Speech to transcribe meeting audio on your device.",
+        "NSCalendarsFullAccessUsageDescription": "Clevi uses your calendar to name your meetings and show who is in them. It never changes your events.",
+        "NSCalendarsUsageDescription": "Clevi uses your calendar to name your meetings and show who is in them. It never changes your events."
       }
     },
     "dmg": {

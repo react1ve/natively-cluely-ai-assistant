@@ -2,6 +2,7 @@ import { ChevronUp, ChevronDown } from "lucide-react";
 import icon from "../icon.png";
 import nativelyMark from "../overlay/heroGlass/natively-mark-black.svg";
 import type { OverlayAppearance } from "../../lib/overlayAppearance";
+import { BRAND_NAME } from '../../lib/brand.mjs';
 
 interface TopPillProps {
     expanded: boolean;
@@ -41,7 +42,7 @@ export default function TopPill({
                     <div className="draggable-area">
                         <button
                             onClick={onLogoClick}
-                            aria-label="Natively"
+                            aria-label={BRAND_NAME}
                             className="interaction-base interaction-press w-8 h-8 rounded-full flex items-center justify-center"
                         >
                             {/* The mark fills the button: its own ring is the
@@ -99,7 +100,7 @@ export default function TopPill({
                     >
                         <img
                             src={icon}
-                            alt="Natively"
+                            alt={BRAND_NAME}
                             className="top-pill-logo w-7 h-7 object-contain opacity-95 force-black-icon"
                             draggable="false"
                             onDragStart={(e) => e.preventDefault()}

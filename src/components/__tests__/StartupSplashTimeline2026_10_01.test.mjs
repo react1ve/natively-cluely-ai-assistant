@@ -265,14 +265,12 @@ describe('splash wiring', () => {
     assert.match(app, /if \(showWelcome\) cameFromWelcome\.current = true;/);
   });
 
-  // The splash is frozen on the mark it was designed with: every stroke 68 wide. On 2026-10-03 the
-  // white logo everywhere else went to 75 and the owner asked for this animation to stay exactly as
-  // it is, so the splash and the app logo are no longer one path. Do not make them agree again by
-  // editing the splash.
-  test('the splash keeps its own equal-stroke mark (every stroke 68 wide)', () => {
+  // The product became Clevi on 2026-10-29: the splash draws the Clevi mark (an open C with a
+  // spark), the same path as the brand master, instead of its own equal-stroke N.
+  test('the splash draws the Clevi mark from the brand master', () => {
     const d = renderer.match(/const MARK_D = '([^']+)'/)[1];
-    assert.ok(d.includes('A338 338'), 'ring: outer radius 406, inner 338');
-    assert.ok(d.includes('M288 192.77 H356') && d.includes('M668 192.77 H736'), 'uprights 68 wide');
+    const master = read('../../../brand/natively-mark-white.svg').match(/ d="([^"]+)"/)[1];
+    assert.equal(d, master);
   });
 
   test('NativelyLogoMark draws the white logo master (brand/natively-mark-white.svg)', () => {

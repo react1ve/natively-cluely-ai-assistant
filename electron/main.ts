@@ -1468,6 +1468,7 @@ import { resolveTrayIcon } from './utils/trayIcon'
 import { appUserModelIdForDisguise } from './utils/windowsTaskbarPolicy'
 import { shouldOpenExternally } from './utils/windowOpenPolicy'
 import { ensureNativeModuleAbi } from './utils/nativeModuleGuard'
+import { BRAND_NAME } from '../src/lib/brand.mjs'
 
 // Opt-in only: this trace writes allowlisted process metadata and IPC byte estimates
 // for a copied-profile native OOM investigation. It is inert unless explicitly enabled.
@@ -9389,7 +9390,7 @@ export class AppState {
     trayIcon.setTemplateImage(choice.template);
 
     this.tray = new Tray(trayIcon)
-    this.tray.setToolTip('Natively') // This tooltip might also need update if we change global shortcut, but global shortcut is removed.
+    this.tray.setToolTip(BRAND_NAME) // This tooltip might also need update if we change global shortcut, but global shortcut is removed.
     this.updateTrayMenu();
 
     // Double-click to show window
@@ -9407,7 +9408,7 @@ export class AppState {
     console.log('[Main] updateTrayMenu called. Screenshot Accelerator:', screenshotAccel);
 
     // Update tooltip for verification
-    this.tray.setToolTip('Natively');
+    this.tray.setToolTip(BRAND_NAME);
 
     // Helper to format accelerator for display (e.g. CommandOrControl+H -> Cmd+H)
     const formatAccel = (accel: string) => {
@@ -9427,7 +9428,7 @@ export class AppState {
 
     const contextMenu = Menu.buildFromTemplate([
       {
-        label: 'Show Natively',
+        label: `Show ${BRAND_NAME}`,
         click: () => {
           this.centerAndShowWindow()
         }

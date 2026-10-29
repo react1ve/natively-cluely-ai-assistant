@@ -179,11 +179,12 @@ export function electronNotify(n: OsNotification): boolean {
     const { Notification } = require('electron');
     if (!Notification.isSupported()) return false;
     closeDetectedNotification();
+    const { withBrand } = require('../../../src/lib/brand.mjs');
     const notif = new Notification({
-        title: n.title,
-        body: n.body,
+        title: withBrand(n.title),
+        body: withBrand(n.body),
         silent: true,
-        actions: [{ type: 'button', text: n.action }],
+        actions: [{ type: 'button', text: withBrand(n.action) }],
         closeButtonText: 'Not now',
     });
     let started = false;

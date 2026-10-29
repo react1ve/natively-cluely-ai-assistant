@@ -134,7 +134,8 @@ function showNotice(w: DictationWiring, n: DictationNotice): void {
     const { Notification } = require('electron');
     if (!Notification.isSupported()) return;
     try { shownNotice?.close(); } catch { /* already gone */ }
-    const notif = new Notification({ title: n.title, body: n.body, silent: true });
+    const { withBrand } = require('../../../src/lib/brand.mjs');
+    const notif = new Notification({ title: withBrand(n.title), body: withBrand(n.body), silent: true });
     notif.on('close', () => { if (shownNotice === notif) shownNotice = null; });
     notif.on('failed', (_e: unknown, error: string) => {
         console.warn(`[Dictation] the OS did not show the notice: ${error}`);

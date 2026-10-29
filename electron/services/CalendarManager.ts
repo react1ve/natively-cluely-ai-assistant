@@ -666,7 +666,7 @@ export class CalendarManager extends EventEmitter {
         try { lead = require('./meetingDetection/meetingOffer').reminderLeadText(leadMinutes); } catch { /* the plain wording above */ }
         const notif = new Notification({
             title: 'Meeting starting soon',
-            body: lastTime ? `"${event.title}" starts in ${lead}.\n${lastTime}` : `"${event.title}" starts in ${lead}. Start Natively?`,
+            body: lastTime ? `"${event.title}" starts in ${lead}.\n${lastTime}` : `"${event.title}" starts in ${lead}. Start ${require('../../src/lib/brand.mjs').BRAND_NAME}?`,
             actions: [
                 { type: 'button', text: 'Start Meeting' },
                 { type: 'button', text: 'Dismiss' },

@@ -171,8 +171,8 @@ test('macOS Dock/Finder show the brand, and CFBundleName is left to the builder 
   const extendInfo = pkg.build?.mac?.extendInfo ?? {};
   assert.equal(
     extendInfo.CFBundleDisplayName,
-    'Natively',
-    'build.mac.extendInfo.CFBundleDisplayName must be "Natively" (Dock/Finder brand)'
+    'Clevi',
+    'build.mac.extendInfo.CFBundleDisplayName must be "Clevi" (Dock/Finder brand, 2026-10-29)'
   );
   assert.ok(
     !('CFBundleName' in extendInfo),
@@ -182,9 +182,9 @@ test('macOS Dock/Finder show the brand, and CFBundleName is left to the builder 
   for (const key of Object.keys(extendInfo).filter((k) => k.endsWith('UsageDescription'))) {
     assert.match(
       extendInfo[key],
-      /^Natively needs |^Natively uses /,
+      /^Clevi needs |^Clevi uses /,
       `${key} renders next to the displayed app name, so it must address the ` +
-        `user as Natively, not as the disguise alias`
+        `user as Clevi, not as the disguise alias`
     );
   }
 });

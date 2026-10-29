@@ -13,6 +13,7 @@ import { AMBIENT_CHAT_RU, AMBIENT_CHAT_ZH, AMBIENT_CHAT_JA, AMBIENT_CHAT_ES } fr
 import { SETTINGS_RU } from './i18n.settings.ru';
 import { PERMISSIONS_RU } from './i18n.permissions.ru';
 import { TRANSCRIPTION_RU } from './i18n.transcription.ru';
+import { withBrand } from './lib/brand.mjs';
 
 // ─── Lightweight in-house i18n ────────────────────────────────────────────────
 // No external dependency. `t(englishText)` returns the translation for the
@@ -417,7 +418,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }, []);
 
     const t = useCallback(
-        (text: string) => (lang === 'en' ? text : (DICT[lang][text] ?? text)),
+        // Every UI string shows the current product name (src/lib/brand.mjs);
+        // dictionary keys stay the English source, so no row moves.
+        (text: string) => withBrand(lang === 'en' ? text : (DICT[lang][text] ?? text)),
         [lang],
     );
 

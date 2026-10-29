@@ -15,6 +15,7 @@ import { NativelyLogoMark } from '../NativelyLogoMark';
 import nativelyIcon from '../../../assets/icon.png';
 import { classifyMicStatus } from '../../lib/micPermissionPolicy.mjs';
 import { useT } from '../../i18n';
+import { BRAND_NAME } from '../../lib/brand.mjs';
 
 const STORAGE_KEY  = 'natively_perms_shown_v1';
 
@@ -735,7 +736,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <img
                     src={nativelyIcon}
-                    alt="Natively"
+                    alt={BRAND_NAME}
                     style={{
                       width: '22px',
                       height: '22px',
@@ -744,7 +745,7 @@ export const PermissionsOnboardingFull: React.FC<Props> = ({ isOpen, onDismiss }
                       flexShrink: 0,
                     }}
                   />
-                  <span style={{ fontSize: '11px', fontWeight: 650, color: COLORS.charcoalInk, flex: 1 }}>Natively</span>
+                  <span style={{ fontSize: '11px', fontWeight: 650, color: COLORS.charcoalInk, flex: 1 }}>{BRAND_NAME}</span>
                   <div style={{
                     width: '28px',
                     height: '16px',

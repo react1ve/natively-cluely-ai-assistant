@@ -7,6 +7,8 @@
 // re-shows the tile). The trailing spaces are deliberate and long-standing;
 // keep them. Pure module, platform injectable.
 
+import { BRAND_NAME } from '../../src/lib/brand.mjs';
+
 export type DisguiseModeName = 'terminal' | 'settings' | 'activity' | 'none';
 
 export function disguiseAppName(mode: DisguiseModeName, platform: NodeJS.Platform): string {
@@ -20,6 +22,6 @@ export function disguiseAppName(mode: DisguiseModeName, platform: NodeJS.Platfor
       return isWin ? 'Task Manager ' : 'Activity Monitor ';
     case 'none':
     default:
-      return 'Natively';
+      return BRAND_NAME;
   }
 }

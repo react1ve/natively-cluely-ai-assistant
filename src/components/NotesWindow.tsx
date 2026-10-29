@@ -1048,7 +1048,7 @@ const NotesWindow: React.FC<{ preview?: NotesWindowPreview }> = ({ preview }) =>
                         {/* The meeting's status: the overlay is hidden in a notepad meeting. */}
                         {phase === 'live' && stopsAt !== null && (
                             <div className="np-elevated rounded-[20px] pl-4 pr-1.5 py-1.5 flex items-center justify-between gap-3" role="status">
-                                <p className="text-[13px] leading-[18px]" style={ink('--np-red')}>Natively stops in 1 minute because nothing has been said.</p>
+                                <p className="text-[13px] leading-[18px]" style={ink('--np-red')}>{t('Natively stops in 1 minute because nothing has been said.')}</p>
                                 <button
                                     type="button"
                                     onClick={() => { setStopsAt(null); window.electronAPI?.meetingAutoStopKeepGoing?.()?.catch?.(() => {}); }}
@@ -1356,7 +1356,7 @@ const NotesWindow: React.FC<{ preview?: NotesWindowPreview }> = ({ preview }) =>
                             </div>
                         )}
                         {phase === 'live' && showTranscript && (
-                            <p className="-mt-1 text-center text-[11px] leading-4" style={ink('--np-ink-tertiary')}>Natively uses AI and can make mistakes.</p>
+                            <p className="-mt-1 text-center text-[11px] leading-4" style={ink('--np-ink-tertiary')}>{t('Natively uses AI and can make mistakes.')}</p>
                         )}
                         {phase === 'live' && paused && !showTranscript && !askOpen && (
                             <p className="-mt-1 text-center text-[12px] leading-4" style={ink('--np-ink-secondary')}>Transcription paused</p>

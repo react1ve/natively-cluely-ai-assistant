@@ -19,5 +19,7 @@ export const TRANSCRIPTION_RU: Record<string, string> = {
     "Transcription is reconnecting…": "Транскрипция переподключается…",
     "Natively can’t hear your microphone. Check Settings › Audio.": "Natively не слышит ваш микрофон. Проверьте Настройки › Звук.",
     "Natively can’t hear the call. Check Settings › Audio.": "Natively не слышит звонок. Проверьте Настройки › Звук.",
+    "Natively stops in 1 minute because nothing has been said.": "Natively остановится через 1 минуту: ничего не было сказано.",
+    "Natively uses AI and can make mistakes.": "Natively использует ИИ и может ошибаться.",
     "Audio is off because Ambient AI Chat is on. Turn it off in Settings › General.": "Звук выключен, потому что включён Ambient AI Chat. Отключите его в Настройках › Основные.",
 };

@@ -5,6 +5,7 @@ import { prepareSplash, renderSplash, type SplashScene } from './startup/splashR
 import {
     LIFT, LOGO_OUT, SPLASH_DISMISS_MS, SPLASH_HARD_CAP_MS, SPLASH_SETTLE_MS,
 } from './startup/splashTimeline';
+import { BRAND_NAME } from '../lib/brand.mjs';
 
 interface StartupSequenceProps {
     onComplete: () => void;
@@ -144,9 +145,9 @@ const StartupSequence: React.FC<StartupSequenceProps> = ({ onComplete }) => {
     return (
         <div ref={boxRef} className="fixed inset-0 z-[100] bg-[#000000] flex items-center justify-center overflow-hidden">
             {plain ? (
-                <img src={appIcon} alt="Natively" className="w-24 h-24 object-contain" />
+                <img src={appIcon} alt={BRAND_NAME} className="w-24 h-24 object-contain" />
             ) : (
-                <canvas ref={canvasRef} role="img" aria-label="Natively" className="absolute inset-0 w-full h-full block" />
+                <canvas ref={canvasRef} role="img" aria-label={BRAND_NAME} className="absolute inset-0 w-full h-full block" />
             )}
         </div>
     );

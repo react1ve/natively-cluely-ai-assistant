@@ -24,6 +24,7 @@ import { SETTINGS_BTN, SettingsRow, SettingsSectionHeading } from './settings/Se
 // The learn-more hover (.t-learn), shared with Plans' "Open" / "Email" actions.
 import './settings/HowItWorksRefund.css';
 import ReviewModal from './ReviewModal';
+import { BRAND_NAME } from '../lib/brand.mjs';
 
 // Built from the AI Providers panel's `.aip-*` system (the same one Retrieval
 // adopts), so About reads as part of Settings rather than its own UI: aip-card
@@ -381,7 +382,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onNavigate, onOpenMo
                     className={isMac ? 'w-[88px] h-[88px]' : 'w-[76px] h-[76px] my-1.5'}
                     draggable={false}
                 />
-                <h2 className="mt-2 text-[22px] leading-7 font-bold tracking-[-0.02em] text-text-primary">Natively</h2>
+                <h2 className="mt-2 text-[22px] leading-7 font-bold tracking-[-0.02em] text-text-primary">{BRAND_NAME}</h2>
                 <div className="mt-0.5 text-xs text-text-secondary tabular-nums select-text">{versionLine}</div>
             </header>
 
