@@ -26,21 +26,8 @@ interface FeatureSlide {
 // --- Data ---
 
 const FEATURES: FeatureSlide[] = [
-    // Sponsor, premium and paid-plan program slides removed (2026-10-28): this
-    // build sells no plan and shows no sponsor ads.
-    {
-        id: 'support_natively',
-        headline: 'Support development',
-        subtitle: 'Built openly and sustained by users',
-        bullets: [
-            'Development driven by real users',
-            'Faster iteration on features that matter',
-
-        ],
-        type: 'support',
-        actionLabel: 'Contribute to development',
-        url: 'https://buymeacoffee.com/evinjohnn'
-    },
+    // Sponsor, premium, paid-plan program and donation slides removed
+    // (2026-10-28/29): this build sells no plan and asks for no payment.
     {
         id: 'advertise_natively',
         headline: 'Advertise with Natively',
