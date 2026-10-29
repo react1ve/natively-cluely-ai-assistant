@@ -11326,6 +11326,13 @@ Provide only the answer, nothing else.`;
   const shouldShowSttSummaryPill =
     !sttNotConfigured && !sttFailed && !sttReconnecting &&
     (sttUserStatus === 'preparing' || sttInterviewerStatus === 'preparing');
+  // Apple Speech refusing the language (macOS 26+ has no Russian model, and with
+  // the language on auto it is asked for the system's) is not a key problem:
+  // say what to change instead of "check its key" (2026-10-29).
+  const appleSpeechLanguageRefused = [
+    [sttUserProvider, sttUserError],
+    [sttInterviewerProvider, sttInterviewerError],
+  ].some(([provider, error]) => provider === 'apple-speech' && /does not support language/i.test(error));
   const sttStatusBanner: { tone: 'warning' | 'error'; title: string; message: string } | null =
     sttNotConfigured
       ? null
@@ -11336,8 +11343,9 @@ Provide only the answer, nothing else.`;
             // Two lines: what stopped, then what to do. The provider's own
             // error (often a bare status like "401 Unauthorized") is not
             // shown; a code on screen explains nothing.
-            message:
-              sttUserStatus === 'failed' && sttInterviewerStatus === 'failed'
+            message: appleSpeechLanguageRefused
+              ? t('Apple Speech does not support this language. Pick a supported language in Settings › Audio, or another provider such as Local Models.')
+              : sttUserStatus === 'failed' && sttInterviewerStatus === 'failed'
                 ? t('Nothing is being transcribed right now. Check your transcription provider and its key in Settings.')
                 : sttUserStatus === 'failed'
                   ? t('Your microphone is no longer being transcribed. Check your transcription provider and its key in Settings.')

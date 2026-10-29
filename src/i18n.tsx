@@ -12,6 +12,7 @@ import { ASSIST_RU, ASSIST_ZH, ASSIST_JA, ASSIST_ES } from './i18n.assist';
 import { AMBIENT_CHAT_RU, AMBIENT_CHAT_ZH, AMBIENT_CHAT_JA, AMBIENT_CHAT_ES } from './i18n.ambientChat';
 import { SETTINGS_RU } from './i18n.settings.ru';
 import { PERMISSIONS_RU } from './i18n.permissions.ru';
+import { TRANSCRIPTION_RU } from './i18n.transcription.ru';
 
 // ─── Lightweight in-house i18n ────────────────────────────────────────────────
 // No external dependency. `t(englishText)` returns the translation for the
@@ -61,6 +62,7 @@ const RU: Record<string, string> = {
     ...AMBIENT_CHAT_RU,
     ...SETTINGS_RU,
     ...PERMISSIONS_RU,
+    ...TRANSCRIPTION_RU,
     // ── Settings sidebar / navigation ──
     'General': 'Основные',
     'AI Providers': 'AI-провайдеры',

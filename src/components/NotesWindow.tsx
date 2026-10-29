@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { motion } from 'framer-motion';
 import { ArrowDown, Check, ChevronDown, ChevronUp, Copy, FileText, ImagePlus, LayoutGrid, Minus, MoreHorizontal, Paperclip, Pause, Play, RotateCcw, Scissors, Search, SquarePen, X } from 'lucide-react';
 import { useResolvedTheme } from '../hooks/useResolvedTheme';
+import { useT } from '../i18n';
 import { applyTypedKeyAtEnd, plainAnswerText } from './meeting/notesView';
 import { useLastTimeRecap } from './assist/useLastTimeRecap';
 import { shouldBlockFocus, shouldFireStealthTapStart } from '../lib/overlayStealthFocusGuards.mjs';
@@ -109,6 +110,7 @@ const EMPTY_INFO: HeadingInfo & { speakers: { me: string; them: string } } = {
 
 const NotesWindow: React.FC<{ preview?: NotesWindowPreview }> = ({ preview }) => {
     const isLight = useResolvedTheme() === 'light';
+    const t = useT();
     const [text, setText] = useState(preview?.text ?? '');
     const [phase, setPhase] = useState<Phase>(preview ? 'live' : 'idle');
     const [meetingId, setMeetingId] = useState<string | null>(null);
@@ -1058,7 +1060,7 @@ const NotesWindow: React.FC<{ preview?: NotesWindowPreview }> = ({ preview }) =>
                             </div>
                         )}
                         {phase === 'live' && problem && stopsAt === null && (
-                            <p className="px-2 text-[12px] leading-4" style={ink('--np-ink-secondary')} role="status">{problem}</p>
+                            <p className="px-2 text-[12px] leading-4" style={ink('--np-ink-secondary')} role="status">{t(problem)}</p>
                         )}
 
                         {/* After Stop: Granola's My notes / Enhanced switch, the thumb sliding between them. */}
