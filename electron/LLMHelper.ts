@@ -4544,10 +4544,14 @@ ANSWER DIRECTLY:`;
    * Returns "" when no instruction is needed (English fixed mode).
    */
   private buildLanguageInstructionSuffix(): string {
+    // Auto names no example language (2026-10-29): the old "If the user writes
+    // in Hindi, respond in Hindi. If in Spanish…" line read as an instruction to
+    // small local models (llama3.2:3b answered every English and Russian
+    // question in Hindi). An explicit request for a language now wins.
     if (!this.aiResponseLanguage || this.aiResponseLanguage === 'auto') {
       return `\n\n[LANGUAGE INSTRUCTION — HIGHEST PRIORITY]
-Detect the language of the user's most recent message and ALWAYS respond in that exact same language.
-If the user writes in Hindi, respond in Hindi. If in Spanish, respond in Spanish. If in English, respond in English.
+Reply in the language the user's most recent message is written in.
+If the user asks for a language ("in English", "на русском"), use that language.
 If the language is ambiguous, default to English.
 You may mix scripts naturally (e.g. code stays in English even when the explanation is in another language).
 [END LANGUAGE INSTRUCTION]`;
