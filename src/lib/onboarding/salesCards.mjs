@@ -1,12 +1,13 @@
 // src/lib/onboarding/salesCards.mjs
 //
-// Cards that sell a plan or the Natively API. This build never raises them:
+// Cards that sell a plan or the Natively API, or ask for a donation. This build
+// never raises them:
 // the stages stay in the catalog (their ids, order and persisted ledger
 // entries are untouched), but their predicate never passes, so the
 // orchestrator skips them like any card whose audience does not match.
 //
-// Not sales: permissions, browser_extension, review_prompt, support (a
-// donation ask, not a subscription), and the gate-only markers.
+// Kept: permissions, browser_extension, review_prompt, and the gate-only
+// markers. `support` (a donation ask) was added 2026-10-29.
 
 export const SALES_CARD_IDS = Object.freeze([
   'plans',
@@ -15,6 +16,7 @@ export const SALES_CARD_IDS = Object.freeze([
   'max_ultra',
   'profile_ad',
   'jd_ad',
+  'support',
 ]);
 
 const SALES = new Set(SALES_CARD_IDS);

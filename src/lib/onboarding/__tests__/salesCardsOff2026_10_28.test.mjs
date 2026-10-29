@@ -1,4 +1,5 @@
-// No card that sells a plan or the Natively API is ever raised (2026-10-28).
+// No card that sells a plan or the Natively API, or asks for a donation, is
+// ever raised (2026-10-28; support added 2026-10-29).
 //
 // The catalog keeps its policy (stageCatalogPolicy2026_09_26.test.mjs still
 // pins who each card is for); App.tsx starts the orchestrator through
@@ -26,10 +27,11 @@ const AUDIENCES = {
   max_ultra: { hasNativelyKey: true, planTier: 'pro', nativelyQuotaPct: 95 },
   profile_ad: {},
   jd_ad: { hasProfile: true },
+  support: {},
 };
 
 const ctx = (user) => ({
-  startupCount: 5, totalUsageMs: 0, turnCount: 0, homepageMountedFor: 60_000,
+  startupCount: 5, totalUsageMs: 0, turnCount: 10, homepageMountedFor: 60_000,
   appInForeground: true, homepageCurrentlyMounted: true, meetingActive: false,
   completed: {}, skipped: new Set(), lastShownTimes: {}, now: NOW,
   userState: { ...DEFAULT_USER_STATE, cardLedger: emptyLedger(NOW), adsAvailable: true, ...user },
