@@ -157,6 +157,16 @@ function isSignedBuild(): boolean {
  *    relaunch an app that lacks a valid Developer ID signature, so an unsigned
  *    macOS build must fall back to the manual "open the download" flow.
  */
+
+/**
+ * electron-updater reads its feed from Resources/app-update.yml, which
+ * electron-builder writes only for publishable targets. A local `--dir` build
+ * has none, and checking anyway failed with ENOENT on every check (2026-10-29).
+ */
+function hasUpdateFeed(): boolean {
+  return fs.existsSync(path.join(process.resourcesPath, 'app-update.yml'))
+}
+
 function canAutoInstall(): boolean {
   if (!app.isPackaged) return false
   if (process.platform === 'darwin') return isSignedBuild()
@@ -3343,6 +3353,8 @@ export class AppState {
     setTimeout(() => {
       if (process.env.NODE_ENV === "development") {
         console.log("[AutoUpdater] Development mode: Skipping auto check (use manual button)");
+      } else if (!hasUpdateFeed()) {
+        console.log("[AutoUpdater] No update feed in this build (app-update.yml): skipping auto check");
       } else if (this.isUndetectable) {
         // Stealth: no automatic egress (GitHub releases check). The manual
         // "check for updates" button stays user-initiated and untouched.
@@ -3588,6 +3600,12 @@ export class AppState {
       // electron-updater flow to the manual GitHub-API-only check.
       if (!app.isPackaged) {
         await this.checkForUpdatesManual()
+      } else if (!hasUpdateFeed()) {
+        // A local build (`package-app.js --dir`) carries no update feed, and the
+        // publish feed is upstream's releases, which would replace this build
+        // with theirs. Nothing to update from: say so instead of the ENOENT.
+        console.log('[AutoUpdater] No update feed in this build (app-update.yml): reporting up to date')
+        this.broadcast("update-not-available", { version: app.getVersion() })
       } else {
         await autoUpdater.checkForUpdatesAndNotify()
       }
