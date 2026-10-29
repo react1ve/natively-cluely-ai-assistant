@@ -8850,6 +8850,20 @@ export class AppState {
     }
   }
 
+  /**
+   * macOS: a hidden app (Hide, ⌘⌥H, Hide Others) still has its windows' visible
+   * flags reading "shown", so ⌘B hid them again and then showed them inactive
+   * inside a hidden app: nothing appeared. In Undetectable mode there is no Dock
+   * tile or tray to unhide it either (2026-10-29). Unhide, re-assert stealth,
+   * and report that the press is used. Always false off macOS.
+   */
+  private revealHiddenApp(): boolean {
+    if (process.platform !== 'darwin' || !app.isHidden()) return false;
+    app.show();
+    this.reassertUndetectableStealth();
+    return true;
+  }
+
   public toggleMainWindow(onCurrentDisplay = false): void {
     console.log(
       "Screenshots: ",
@@ -8857,6 +8871,9 @@ export class AppState {
       "Extra screenshots: ",
       this.screenshotHelper.getExtraScreenshotQueue().length
     )
+
+    // A hidden app is brought back before anything is toggled (see revealHiddenApp).
+    if (this.revealHiddenApp()) return;
 
     const mode = this.windowHelper.getCurrentWindowMode();
 
@@ -9799,6 +9816,15 @@ export class AppState {
     // dock re-show lands at the launcher's ready-to-show, which on a cold launch
     // can arrive later than the toggle path's retry window. Extra isVisible()
     // re-checks are cheap and stop early via the isUndetectable guard.
+    // macOS, persisted-ON launch: the early dock.hide() ran before any window
+    // existed. Electron's dock.hide() marks the windows that exist at that
+    // moment as unhideable (an app with no Dock tile cannot be unhidden); the
+    // launcher, overlay and pill created after it stayed hideable, so a Hide
+    // (⌘⌥H, Hide Others) made them vanish with nothing left to bring them back
+    // (2026-10-29). Hide again now that they exist, as the runtime toggle does.
+    if (process.platform === 'darwin' && this.isUndetectable) {
+      try { app.dock?.hide(); } catch (e) { console.warn('[Stealth] startup dock.hide() failed:', e); }
+    }
     this.reassertUndetectableStealth(DOCK_ENFORCE_STARTUP_MAX_ATTEMPTS);
     // Persisted-ON launch: start the content-protection loop too (the toggle
     // path starts it in setUndetectable, which a cold launch never passes

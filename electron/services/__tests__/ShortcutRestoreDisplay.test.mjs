@@ -292,6 +292,7 @@ function toggleFixture({ visible = true, expanded = true, mode = 'overlay' } = {
   const calls = [];
   const host = Object.create(mainModule.exports.ToggleHost.prototype);
   host.screenshotHelper = { getScreenshotQueue: () => [], getExtraScreenshotQueue: () => [] };
+  host.revealHiddenApp = () => false; // the app is not hidden in these cases
   host.windowHelper = {
     getCurrentWindowMode: () => mode,
     isVisible: () => visible,
