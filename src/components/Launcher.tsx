@@ -14,7 +14,6 @@ import MeetingDetails from './MeetingDetails';
 import TopSearchPill from './TopSearchPill';
 import GlobalChatOverlay from './GlobalChatOverlay';
 import { motion, AnimatePresence, useReducedMotion, type TargetAndTransition, type Variants } from 'framer-motion';
-import { FeatureSpotlight } from './FeatureSpotlight';
 import './LauncherCta.css';
 import { analytics } from '../lib/analytics/analytics.service'; // Added analytics import
 import { useShortcuts } from '../hooks/useShortcuts';
@@ -1188,17 +1187,11 @@ const Launcher: React.FC<LauncherProps> = ({ request, onStartMeeting, onOpenSett
 
                                     {/* 2. Hero Section Cards */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 h-[198px]">
-                                        {/* Default Intro — natively support & upcoming features.
-                                            Calendar "Up Next" lives in Settings → Calendar, not here. */}
-                                        <div className="md:col-span-2 h-full">
-                                            <FeatureSpotlight />
-                                        </div>
-
-
-
-                                        {/* Right Secondary Card — violet-tinted, "Calendar Connected" + peeking next meeting */}
+                                        {/* The spotlight carousel is gone (2026-10-29): every slide sold
+                                            something (sponsor, plans, donations, ad slots). The calendar
+                                            card takes the row. */}
                                         <UpcomingCalendarCard
-                                            className="md:col-span-1"
+                                            className="md:col-span-3"
                                             isConnected={isCalendarConnected}
                                             // Re-fetch: the events loaded at mount were fetched before the
                                             // connection existed, so the card would stay empty until a Refresh.
